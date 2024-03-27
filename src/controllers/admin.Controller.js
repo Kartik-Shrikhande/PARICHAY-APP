@@ -12,7 +12,7 @@ const AdminSignup= async (req, res) => {
         if (Object.keys(req.body).length == 0) return res.status(400).send({ status: false, message: "Enter Required Data" })
         // Check if the user already exists
         const existingUser = await adminModel.findOne({ email });
-        console.log(email);
+        console.log(email,password);
         if (existingUser) {
             return res.status(400).json({ message: 'User with this email already exists' });
         }
