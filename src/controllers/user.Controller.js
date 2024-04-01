@@ -76,7 +76,7 @@ const userlogin =async (req, res) => {
         );
          res.setHeader('Authorization', token);
 
-        return res.status(200).json({ message:'User login Successfully' });
+        return res.status(200).json(user);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
