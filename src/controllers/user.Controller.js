@@ -2,50 +2,7 @@ const userModel = require("../models/user.Model");
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 require('dotenv').config({path:'.env'})
-// const nodemailer = require('nodemailer');
-// const {generateOTP}=require('../utility/otpUtility')
 
-
-// const forgetPassword = async (req, res) => {
-//     try {
-//         const { email } = req.body;
-//         const user = await userModel.findOne({ email });
-//         if (!user) {
-//             return res.status(404).json({ message: 'User not found' });
-//         }
-
-//         const otp = generateOTP(); // Generate OTP
-//         user.otp = otp; // Save OTP in user document
-//         await user.save();
-
-//         // Send OTP via email
-//         const transporter = nodemailer.createTransport({
-//             service: 'gmail',
-//             auth: {
-//                 user: 'kartikshrikhande11@gmail.com', // Replace with your Gmail email
-//                 pass: '' // Replace with your Gmail password
-//             }
-//         });
-
-//         const mailOptions = {
-//             from: 'kartikshrikhande11@gmail.com',
-//             to: email,
-//             subject: 'Password Reset OTP',
-//             text: `Your OTP for password reset is: ${otp}`
-//         };
-
-//         transporter.sendMail(mailOptions, (error, info) => {
-//             if (error) {
-//                 console.error(error);
-//                 return res.status(500).json({ error: 'Failed to send OTP email' });
-//             }
-//             console.log('OTP email sent:', info.response);
-//             res.json({ message: 'OTP sent successfully' });
-//         });
-//     } catch (error) {
-//         res.status(500).json({ message: error.message });
-//     }
-// };
 
 const userSignup = async (req, res) => {
     try {
@@ -79,7 +36,7 @@ const userSignup = async (req, res) => {
             age,
             height,
             income,
-            otp
+        
             
         });
         const token = jwt.sign({userId:newUser._id}, process.env.SECRET_KEY, { expiresIn: '1d' }); // Token expires in 1 day

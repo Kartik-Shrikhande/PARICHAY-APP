@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 require('dotenv').config({path:'.env'})
-const userSignupModel = require("../models/admin.Model");
 
 
 const authentication = async (req, res, next) => {
@@ -25,21 +24,21 @@ const authentication = async (req, res, next) => {
     }
 }
 
-const authorisation = async (req, res, next) => {
-    try {
-        let userId = req.params.userId
-        //checking for valid author Id
-        if (!userId) return res.status(400).send({ status: false, message: "Invalid UserId" })
-        let checkAuthorId = await authorModel.findById(userId)
-        //checking if provided AuthorId exist or not
-        if (!checkAuthorId) return res.status(404).send({ status: false, message: "UserId Does Not Exist" })
-        //checking autherization of user
-        if (userId != req.userId) return res.status(403).send({ status: false, message: "Unauthorised User" })
-        next()
-    } catch (error) {
-        return res.status(500).send({ status: false, message: error.message })
-    }
-}
+// const authorisation = async (req, res, next) => {
+//     try {
+//         let userId = req.params.userId
+//         //checking for valid author Id
+//         if (!userId) return res.status(400).send({ status: false, message: "Invalid UserId" })
+//         let checkAuthorId = await authorModel.findById(userId)
+//         //checking if provided AuthorId exist or not
+//         if (!checkAuthorId) return res.status(404).send({ status: false, message: "UserId Does Not Exist" })
+//         //checking autherization of user
+//         if (userId != req.userId) return res.status(403).send({ status: false, message: "Unauthorised User" })
+//         next()
+//     } catch (error) {
+//         return res.status(500).send({ status: false, message: error.message })
+//     }
+// }
 module.exports = { authentication,
-authorisation    
+// authorisation    
 }

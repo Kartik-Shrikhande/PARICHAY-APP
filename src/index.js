@@ -2,17 +2,14 @@
 const express = require("express")
 const app = express()
 const mongoose = require("mongoose")
-const adminRouter = require("./routes/admin.Routes")
+
 const userRouter = require("./routes/user.Routes")
 require('dotenv').config({path:'./.env'})
 
 //parsing data in jason format
 app.use(express.json())
 // app.use('/', router)
-app.use('/admin',adminRouter)
 app.use('/user',userRouter)
-
-
 
 
 //connecting mongodb with nodejs
