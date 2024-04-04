@@ -10,6 +10,9 @@ const userSignup = async (req, res) => {
         const { email, password, phoneNumber, title, fullName, gender, dateOfBirth, address, profession, 
             education, caste, age, height, income,otp } = req.body;
  
+         if(!email)  return res.status(400).json({ message: 'email is required' });
+         if(!password)  return res.status(400).json({ message: 'password is required' });
+
           console.log("line 13",req.body);
 
         // Check if the user already exists
