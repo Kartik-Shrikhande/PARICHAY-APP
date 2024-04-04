@@ -9,6 +9,8 @@ const userSignup = async (req, res) => {
         // Extracting user input from request body
         const { email, password, phoneNumber, title, fullName, gender, dateOfBirth, address, profession, 
             education, caste, age, height, income,otp } = req.body;
+ 
+          console.log(req.body);
 
         // Check if the user already exists
         const existingUser = await userModel.findOne({email: email});
@@ -36,8 +38,7 @@ const userSignup = async (req, res) => {
             age,
             height,
             income,
-        
-            
+    
         });
         const token = jwt.sign({userId:newUser._id}, process.env.SECRET_KEY, { expiresIn: '1d' }); // Token expires in 1 day
 
