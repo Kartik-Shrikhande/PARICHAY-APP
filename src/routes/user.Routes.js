@@ -4,6 +4,8 @@ const userProfileController = require("../controllers/user.Controller")
 // const utility = require("../controllers/otp.Controller")
 const Middleware= require("../middleware/middleware")
 
+console.log("userRoutes");
+
 router.post('/signup', userProfileController.userSignup)
 router.post('/login', userProfileController.userlogin)
 // router.post('/forget', utility.sendEmailVerificationOTP)
