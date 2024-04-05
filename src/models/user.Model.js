@@ -3,82 +3,82 @@ const mongoose = require("mongoose")
 const userProfile = new mongoose.Schema({
     email: {
         type: String,
-       // required: true,
+       required: true,
         unique: true
     },
     password: {
         type: String,
-       // required: true
+      required: true
     },
     phoneNumber: {
         type: String,
-        //// required: true
+        required: true
     },
     title: {
         type: String,
-        //// required: true,
+         required: true,
         enum: ['Mr', 'Miss']
     },
     fullName: {
         type: String,
-        //// required: true
+        required: true
     },
     gender: {
         type: String,
-        //// required: true,
+       required: true,
         enumm: ['Male', 'Female', 'Others']
     },
     dateOfBirth: {
         type: Date,
-        //// required: true
+        required: true
     },
     address: {
         type: String,
-       // required: true
+      required: true
     },
     profession: {
         type: String,
-       // required: true
+      required: true
     },
     education: {
         type: String,
-       // required: true
+      required: true
     },
     maritalStatus: {
         type: String,
         enum: ['Single', 'Married', 'Divorced', 'Widowed'],
-       // required: true
+        required: true
     },
     religion: {
         type: String,
-       // required: true
+      required: true
     },
     caste: {
         type: String,
-       // required: true
+      required: true
     },
     languages: {
-        type: String,
-       // required: true
+        type: [String],
+      required: true
     },
     age: {
         type: Number,
-       // required: true
+      required: true
     },
     height: {
         type: String,
-       // required: true
+      required: true
     },
     income: {
         type: String,
-       // required: true
+      required: true
     },
     aboutMe: {
         type: String
     },
-    // hobbiesAndInterests: {
-    //     type: [String]
-    // },
+    hobbiesAndInterests: {
+        type: [String]
+    },
     PartnerPreferences: {
         ageRange: {
             min: Number,
@@ -105,6 +105,13 @@ const userProfile = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     }],
+
+    chatHistory: [{
+        senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
+        receiverId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
+        message: String,
+        timestamp: { type: Date, default: Date.now }
+      }],
     isDeleted: {
         type: Boolean,
         default: false

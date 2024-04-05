@@ -8,10 +8,30 @@ const userSignup = async (req, res) => {
     try {
         // Extracting user input from request body
         const { email, password, phoneNumber, title, fullName, gender, dateOfBirth, address, profession, 
-            education, caste, age, height, income,otp } = req.body;
+            education, maritalStatus,religion,caste, age, height, income,languages,aboutMe,hobbiesAndInterests,
+            PartnerPreferences,photographs} = req.body;
  
          if(!email)  return res.status(400).json({ message: 'email is required' });
          if(!password)  return res.status(400).json({ message: 'password is required' });
+         
+         
+
+         if(!phoneNumber)  return res.status(400).json({ message: 'phoneNumber is required' });
+         if(!title)  return res.status(400).json({ message: 'title is required' });
+         if(!fullName)  return res.status(400).json({ message: 'fullName is required' });
+         if(!gender)  return res.status(400).json({ message: 'gender is required' });
+         if(!dateOfBirth)  return res.status(400).json({ message: 'dateOfBirth is required' });
+         if(!address)  return res.status(400).json({ message: 'address is required' });
+         if(!profession)  return res.status(400).json({ message: 'profession is required' });
+         if(!education)  return res.status(400).json({ message: 'education is required' });
+         if(!maritalStatus)  return res.status(400).json({ message: 'maritalStatus is required' });
+         if(!religion)  return res.status(400).json({ message: 'religion is required' });
+         if(!caste)  return res.status(400).json({ message: 'caste is required' });
+         if(!age)  return res.status(400).json({ message: 'age is required' });
+         if(!height)  return res.status(400).json({ message: 'height is required' });
+         if(!income)  return res.status(400).json({ message: 'income is required' });
+         
+
 
           console.log("line 13",req.body);
 
@@ -37,11 +57,17 @@ const userSignup = async (req, res) => {
             address,
             profession,
             education,
+            maritalStatus,
+            religion,
             caste,
             age,
             height,
             income,
-    
+            languages,
+            aboutMe,
+            hobbiesAndInterests,
+            PartnerPreferences,
+            photographs
         });
         const token = jwt.sign({userId:newUser._id}, process.env.SECRET_KEY, { expiresIn: '1d' }); // Token expires in 1 day
 
