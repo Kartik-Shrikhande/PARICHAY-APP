@@ -2,46 +2,28 @@ const userModel = require("../models/user.Model");
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 require('dotenv').config({ path: '.env' })
-
+const { validationResult } = require('express-validator');
 
 const userSignup = async (req, res) => {
     try {
-        // Extracting user input from request body
         const { email, phoneNumber, password, title, fullName, gender, dateOfBirth, address, profession,
             education, maritalStatus, religion, caste, age, height, income, languages, aboutMe, hobbiesAndInterests,
-            PartnerPreferences, photographs } = req.body;
+            PartnerPreferences, photographs
+        } = req.body;
 
-        if (!email) return res.status(400).json({ message: 'email is required' });
-        if (!phoneNumber) return res.status(400).json({ message: 'phoneNumber is required' });
-        if (!password) return res.status(400).json({ message: 'password is required' });
-
-        // if (!title) return res.status(400).json({ message: 'title is required' });
-        // if (!fullName) return res.status(400).json({ message: 'fullName is required' });
-        // if (!gender) return res.status(400).json({ message: 'gender is required' });
-        // if (!dateOfBirth) return res.status(400).json({ message: 'dateOfBirth is required' });
-        // if (!address) return res.status(400).json({ message: 'address is required' });
-        // if (!profession) return res.status(400).json({ message: 'profession is required' });
-        // if (!education) return res.status(400).json({ message: 'education is required' });
-        // if (!maritalStatus) return res.status(400).json({ message: 'maritalStatus is required' });
-        // if (!religion) return res.status(400).json({ message: 'religion is required' });
-        // if (!caste) return res.status(400).json({ message: 'caste is required' });
-        // if (!age) return res.status(400).json({ message: 'age is required' });
-        // if (!height) return res.status(400).json({ message: 'height is required' });
-        // if (!income) return res.status(400).json({ message: 'income is required' });
-
-
-        // Check if the user already exists
-        const existingUser = await userModel.findOne({ email: email });
-        if (existingUser) {
-            return res.status(400).json({ message: 'User with this email already exists' });
+        // Check for validation errors
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
         }
 
+        const existingUser = await userModel.findOne({ email: email })
+        if (existingUser) {
+            return res.status(400).json({ message: 'User with this email already exists' })
+        }
         // Hashing the password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Create a new user instance
+        const hashedPassword = await bcrypt.hash(password, 10)
         const newUser = await userModel.create({
-
             email,
             password: hashedPassword,
             phoneNumber,
@@ -64,16 +46,15 @@ const userSignup = async (req, res) => {
             PartnerPreferences,
             photographs
         });
-        const token = jwt.sign({ userId: newUser._id }, process.env.SECRET_KEY, { expiresIn: '1d' }); // Token expires in 1 day
-
-        // Set token in response headers
-        res.setHeader('Authorization', token);
-        // Respond with success message
-        return res.status(201).json({ message: 'User created successfully', user: newUser });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+        const token = jwt.sign({ userId: newUser._id }, process.env.SECRET_KEY, { expiresIn: '1d' })
+        res.setHeader('token', token);
+        return res.status(201).json({ message: 'User created successfully', user: newUser })
     }
-};
+    catch (error) {
+        return res.status(500).json({ message: error.message })
+    }
+}
+
 
 
 // Route to handle user sign-in

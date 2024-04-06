@@ -3,10 +3,10 @@ const router = express.Router();
 const userProfileController = require("../controllers/user.Controller")
 // const utility = require("../controllers/otp.Controller")
 const Middleware= require("../middleware/middleware")
+const userValidation = require("../validations/validations");
 
 
-
-router.post('/signup', userProfileController.userSignup)
+router.post('/signup', userValidation.userValidationRules(),userProfileController.userSignup)
 router.post('/login', userProfileController.userlogin)
 // router.post('/forget', utility.sendEmailVerificationOTP)
 
