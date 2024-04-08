@@ -128,8 +128,27 @@ const resetPassword = async (req, res) => {
 // Route to get all users
 const getAllUsers = async (req, res) => {
     try {
+        const {minAge,maxAge,minHeight,maxHeight,caste,education} = req.query
+        
+       let data ={};
+       if(minAge && maxAge ){
+        data.age ={$gte:minAge,$lte :maxAge}
+       };
+    
+       if(minHeight && maxHeight ){
+        data.height ={$gte:minHeight,$lte :maxHeight}
+       };
 
-        const users = await userModel.find({ isDeleted: false });
+       if(caste){
+        data.caste=caste
+       };
+
+       if(education){
+        data.education= { $in: education };
+        console.log(data.education);
+       };
+
+        const users = await userModel.find({ isDeleted: false, ...data });
         res.status(200).json({ total: users.length, data: users });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -183,7 +202,7 @@ const updateUserProfile = async (req, res) => {
                 photographFile = await cloudinary(photograph[0].buffer);
             };
     
-        if (Object.keys(req.body).length === 0 && Object.keys(req.files).length === 0) return res.status(400).send({ status: false, message: "Enter some Data to update" })
+        if (Object.keys(req.body).length === 0) return res.status(400).send({ status: false, message: "Enter some Data to update" })
 
         // update blog document
         let update = await userModel.findOneAndUpdate({ _id: userId },
