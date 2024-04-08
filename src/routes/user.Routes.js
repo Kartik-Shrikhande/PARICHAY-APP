@@ -41,5 +41,6 @@ router.put('/update',upload.fields([
 router.delete('/delete', userProfileController.deleteUser)
 router.post('/reset', userProfileController.resetPassword)
 router.get('/prices',userProfileController.pricesList)
+router.post('/subscription',userProfileController.subscription)
 
 module.exports=router;

@@ -115,7 +115,8 @@ const userProfile = new mongoose.Schema({
 
       isSubscribed:{
         type:String,
-        
+        default:"false"
+
       },
     isDeleted: {
         type: Boolean,

@@ -1,4 +1,5 @@
 const userModel = require("../models/user.Model");
+const userSubscriptionModel = require("../models/subscription.model");
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 require('dotenv').config({ path: '.env' })
@@ -274,11 +275,34 @@ const pricesList = async (req, res) => {
 
   const subscription = async (req, res) => {
     try {
-      
+        const user = req.userId
+        const findUser = await userModel.findById(user);
+        if (!findUser) {
+            return res.status(404).json({ msg: 'user not found' });
+        }
+       findUser.isSubscribed = "true" 
+             await findUser.save()
+
+       const {paymentId,price}=req.body
+       const subscription = await userSubscriptionModel.create(
+        {
+            userId:user,
+            paymentId,
+            price,
+        }
+       )
+         return res.status(200).json({message:'Subscription added for user',subscription:subscription});
+
     } catch (err) {
       return res.status(500).send({ status: false, message: err.message});
   }
   }
+
+
+
+
+
+  
 module.exports = {
     userSignup,
     userlogin,
@@ -289,7 +313,8 @@ module.exports = {
     deleteUser,
     // forgetPassword,
     resetPassword,
-    pricesList
+    pricesList,
+    subscription
 }
 
 
