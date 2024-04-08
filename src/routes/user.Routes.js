@@ -18,7 +18,6 @@ router.post('/signup',upload.fields([
 router.post('/login', userProfileController.userlogin)
 
 
-router.get('/prices',userProfileController.pricesList)
 // router.post('/forget', utility.sendEmailVerificationOTP)
 
 
@@ -41,6 +40,6 @@ router.put('/update',upload.fields([
     
 router.delete('/delete', userProfileController.deleteUser)
 router.post('/reset', userProfileController.resetPassword)
-
+router.get('/prices',userProfileController.pricesList)
 
 module.exports=router;

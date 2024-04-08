@@ -112,6 +112,11 @@ const userProfile = new mongoose.Schema({
         message: String,
         timestamp: { type: Date, default: Date.now }
       }],
+
+      isSubscribed:{
+        type:String,
+        
+      },
     isDeleted: {
         type: Boolean,
         default: false

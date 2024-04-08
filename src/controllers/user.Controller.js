@@ -272,6 +272,13 @@ const pricesList = async (req, res) => {
   }
   }
 
+  const subscription = async (req, res) => {
+    try {
+      
+    } catch (err) {
+      return res.status(500).send({ status: false, message: err.message});
+  }
+  }
 module.exports = {
     userSignup,
     userlogin,
