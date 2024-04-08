@@ -13,7 +13,13 @@ const userSignup = async (req, res) => {
             PartnerPreferences
         } = req.body;
 
-        const {photograph} = req.files
+        let photograph 
+        if(req.files){
+        //   let{photograph} = req.files
+          photograph=req.files.photograph
+        }
+
+       
       
 
         // Check for validation errors

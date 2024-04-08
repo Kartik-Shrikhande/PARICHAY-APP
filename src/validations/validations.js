@@ -7,8 +7,7 @@ const userValidationRules = () => {
 
     // Password validation
     body('password') .notEmpty().withMessage('password is required')
-    .isLength({ min: 8,max: 14 }).withMessage('Password must be between 8 and 14 characters long ')
-    .isStrongPassword().withMessage('Password must be strong and should have one upperCase one lower case letter, special character and one number'),
+    .isLength({ min: 8,max: 14 }).withMessage('Password must be between 8 and 14 characters long '),
 
     // Phone number validation
     body('phoneNumber').notEmpty().isMobilePhone().withMessage('Phone number is required')
