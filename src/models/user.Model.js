@@ -46,7 +46,7 @@ const userProfile = new mongoose.Schema({
     },
     maritalStatus: {
         type: String,
-        enum: ['Single', 'Married', 'Divorced', 'Widowed'],
+        enum: ['Single', 'Divorced', 'Widowed'],
       //   required: true
     },
     religion: {

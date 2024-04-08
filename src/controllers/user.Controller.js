@@ -137,7 +137,7 @@ const resetPassword = async (req, res) => {
 // Route to get all users
 const getAllUsers = async (req, res) => {
     try {
-        const {minAge,maxAge,minHeight,maxHeight,caste,education} = req.query
+        const {minAge,maxAge,minHeight,maxHeight,caste,gender,maritalStatus} = req.query
         
        let data ={};
        if(minAge && maxAge ){
@@ -151,11 +151,23 @@ const getAllUsers = async (req, res) => {
        if(caste){
         data.caste=caste
        };
-
-       if(education){
-        data.education= { $in: education };
-        console.log(data.education);
+       
+       if(gender){
+        data.gender=gender
        };
+       if(maritalStatus){
+        data.maritalStatus=maritalStatus
+       };
+    //    if(education){
+    //     data.education= { $in: education };
+    //    
+    //    };
+
+    // if (education && Array.isArray(education)) {
+    //     // Filter users where the education field matches any value in the provided array
+    //     data.education = { $in: education };
+    //     console.log(data.education);
+    // }
 
         const users = await userModel.find({ isDeleted: false, ...data });
         res.status(200).json({ total: users.length, data: users });
@@ -245,6 +257,21 @@ const deleteUser = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+
+const pricesList = async (req, res) => {
+    try {
+      const prices = [
+        {plan:'Basic', price:200, subscriptionTiming:'10 days' ,profileVisits:100 },
+        {plan:'Economy' ,price:400, subscriptionTiming:'30 days' ,profileVisits:200},
+        { plan:'Premium',price:1000, subscriptionTiming:'90 days' ,profileVisits:1000}  
+      ];
+      return res.status(200).json({ status: true, prices: prices})
+    } catch (err) {
+      return res.status(500).send({ status: false, message: err.message});
+  }
+  }
+
 module.exports = {
     userSignup,
     userlogin,
@@ -254,7 +281,8 @@ module.exports = {
     updateUserProfile,
     deleteUser,
     // forgetPassword,
-    resetPassword
+    resetPassword,
+    pricesList
 }
 
 
