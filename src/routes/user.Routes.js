@@ -18,7 +18,7 @@ router.post('/signup',upload.fields([
 router.post('/login', userProfileController.userlogin)
 
 
-router.post('/prices',userProfileController.pricesList)
+router.get('/prices',userProfileController.pricesList)
 // router.post('/forget', utility.sendEmailVerificationOTP)
 
 
