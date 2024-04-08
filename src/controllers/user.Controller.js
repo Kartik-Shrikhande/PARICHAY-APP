@@ -180,7 +180,7 @@ const getAllUsers = async (req, res) => {
 const getUser = async (req, res) => {
     try {
         const user = req.userId
-
+       console.log("line 183");
         const findUser = await userModel.findOne({ _id: user, isDeleted: false });
         if (!findUser) {
             return res.status(404).json({ msg: 'user not found' });
