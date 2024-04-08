@@ -13,6 +13,9 @@ const userSignup = async (req, res) => {
             PartnerPreferences
         } = req.body;
 
+        console.log("line 17");
+
+
         let photograph 
         if(req.files){
         //   let{photograph} = req.files
