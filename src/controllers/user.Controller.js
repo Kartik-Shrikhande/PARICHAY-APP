@@ -48,13 +48,12 @@ const userSignup = async (req, res) => {
         });
         const token = jwt.sign({ userId: newUser._id }, process.env.SECRET_KEY, { expiresIn: '1d' })
         res.setHeader('token', token);
-        return res.status(201).json({ message: 'User created successfully', user: newUser })
+        return res.status(201).json({ message: 'User created successfully', user: newUser, token:token })
     }
     catch (error) {
         return res.status(500).json({ message: error.message })
     }
 }
-
 
 
 // Route to handle user sign-in
@@ -81,8 +80,7 @@ const userlogin = async (req, res) => {
         const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '24h' } // Token expires in 24 hour
         );
         res.setHeader('Authorization', token);
-
-        return res.status(200).json(user);
+        return res.status(200).json({data:user,token:token});
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
