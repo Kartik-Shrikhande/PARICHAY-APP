@@ -57,10 +57,10 @@ const userProfile = new mongoose.Schema({
         type: String,
     //   required: true
     },
-    languages: {
-        type: [String],
+    languages: [{
+        type: String,
     //   required: true
-    },
+    }],
     age: {
         type: Number,
     //   required: true
@@ -90,8 +90,8 @@ const userProfile = new mongoose.Schema({
         caste: String,
         languages: String
     },
-    photographs: {
-        type: [String]
+    photograph: {
+        type: String
     },
     connections: [{ 
         type: mongoose.Schema.Types.ObjectId,

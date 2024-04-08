@@ -7,8 +7,8 @@ const userValidationRules = () => {
 
     // Password validation
     body('password') .notEmpty().withMessage('password is required')
-    .isLength({ min: 8,max: 14 }).withMessage('Password must be between 8 and 14 characters long')
-    .isStrongPassword().withMessage('Password must be strong'),
+    .isLength({ min: 8,max: 14 }).withMessage('Password must be between 8 and 14 characters long ')
+    .isStrongPassword().withMessage('Password must be strong and should have one upperCase one lower case letter, special character and one number'),
 
     // Phone number validation
     body('phoneNumber').notEmpty().isMobilePhone().withMessage('Phone number is required')
@@ -42,8 +42,9 @@ const userValidationRules = () => {
     body('caste').notEmpty().withMessage('Caste is required'),
 
     // Languages validation (assuming it's an array)
-    body('languages').notEmpty().withMessage('language is required')
-    .isArray().withMessage('Languages must be provided as an array'),
+    // body('languages')
+    // .notEmpty().withMessage('language is required')
+    // .isArray().withMessage('Languages must be provided as an array'),
 
     // Age validation
     body('age').notEmpty().withMessage('Age is required')

@@ -3,13 +3,18 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 require('dotenv').config({ path: '.env' })
 const { validationResult } = require('express-validator');
+const cloudinary =require('../.config/cloudinary')
+
 
 const userSignup = async (req, res) => {
     try {
         const { email, phoneNumber, password, title, fullName, gender, dateOfBirth, address, profession,
             education, maritalStatus, religion, caste, age, height, income, languages, aboutMe, hobbiesAndInterests,
-            PartnerPreferences, photographs
+            PartnerPreferences
         } = req.body;
+
+        const {photograph} = req.files
+      
 
         // Check for validation errors
         const errors = validationResult(req);
@@ -23,6 +28,13 @@ const userSignup = async (req, res) => {
         }
         // Hashing the password
         const hashedPassword = await bcrypt.hash(password, 10)
+
+         let photographFile;
+
+        if (photograph) {
+            photographFile = await cloudinary(photograph[0].buffer);
+        };
+
         const newUser = await userModel.create({
             email,
             password: hashedPassword,
@@ -44,7 +56,7 @@ const userSignup = async (req, res) => {
             aboutMe,
             hobbiesAndInterests,
             PartnerPreferences,
-            photographs
+            photograph:photographFile?.secure_url
         });
         const token = jwt.sign({ userId: newUser._id }, process.env.SECRET_KEY, { expiresIn: '1d' })
         res.setHeader('token', token);
@@ -162,18 +174,25 @@ const updateUserProfile = async (req, res) => {
 
         // If user profile already exists, update it
         let { email, password, phoneNumber, title, fullName, gender, dateOfBirth, address, profession,
-            education, caste, age, height, income } = req.body
+            education, caste, age, height, income} = req.body
 
-        if (Object.keys(req.body).length == 0) return res.status(400).send({ status: false, message: "Enter some Data to update" })
+            const {photograph} = req.files
+            let photographFile;
+
+            if (photograph) {
+                photographFile = await cloudinary(photograph[0].buffer);
+            };
+    
+        if (Object.keys(req.body).length === 0 && Object.keys(req.files).length === 0) return res.status(400).send({ status: false, message: "Enter some Data to update" })
 
         // update blog document
-        let updateBlog = await userModel.findOneAndUpdate({ _id: userId },
+        let update = await userModel.findOneAndUpdate({ _id: userId },
             {
                 $set: email, password, phoneNumber, title, fullName, gender, dateOfBirth, address, profession,
-                education, caste, age, height, income
+                education, caste, age, height, income, photograph:photographFile?.secure_url
             },
             { new: true })
-        return res.status(200).send({ status: true, message: 'User is updated', updateBlog })
+        return res.status(200).send({ status: true, message: 'User is updated', update })
     }
 
     catch (error) {

@@ -5,9 +5,18 @@ const userProfileController = require("../controllers/user.Controller")
 const Middleware= require("../middleware/middleware")
 const userValidation = require("../validations/validations");
 
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage:storage});
 
-router.post('/signup', userValidation.userValidationRules(),userProfileController.userSignup)
+
+router.post('/signup',upload.fields([
+    { name:"photograph", maxCount:1}
+    ]), 
+    userValidation.userValidationRules(),userProfileController.userSignup)
+
 router.post('/login', userProfileController.userlogin)
+
 // router.post('/forget', utility.sendEmailVerificationOTP)
 
 
@@ -23,7 +32,11 @@ router.use(Middleware.authentication)
 // router.post('/profile', userProfileController.CreateUserProfile)
 router.get('/users', userProfileController.getAllUsers)
 router.get('/user', userProfileController.getUser)
-router.put('/update', userProfileController.updateUserProfile)
+
+router.put('/update',upload.fields([
+    { name:"photograph", maxCount:1}
+    ]), userProfileController.updateUserProfile)
+    
 router.delete('/delete', userProfileController.deleteUser)
 router.post('/reset', userProfileController.resetPassword)
 
