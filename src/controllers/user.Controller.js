@@ -7,6 +7,7 @@ const cloudinary =require('../.config/cloudinary')
 
 
 
+
 const userSignup = async (req, res) => {
     try {
         // const { email, phoneNumber, password, title, fullName, gender, dateOfBirth, address, profession,
@@ -35,12 +36,44 @@ const userSignup = async (req, res) => {
             address,
             correspondingAddress,
             maritalStatus,
-            age
+            age,
+            religion,
+            caste,
+            languages,
+            aboutMe,
   
         } = req.body;
 
-   
 
+
+        if (!email)  return res.status(400).json({ message: 'Email is required' });
+        if (!password) return res.status(400).json({ message: 'Password is required' });
+        if (!title) return res.status(400).json({ message: 'Title is required' });
+        if (!fullName) return res.status(400).json({ message: 'Full name is required' });
+        if (!fathersName) return res.status(400).json({ message: 'Father\'s name is required' });
+        if (!phoneNumber) return res.status(400).json({ message: 'Phone number is required' });
+        if (!gender) return res.status(400).json({ message: 'Gender is required' });
+        if (!dateOfBirth) return res.status(400).json({ message: 'Date of birth is required' });
+        if (!birthTime) return res.status(400).json({ message: 'Birth time is required' });
+        if (!nativePlace) return res.status(400).json({ message: 'Native place is required' });
+        if (!height) return res.status(400).json({ message: 'Height is required' });
+        if (!education) return res.status(400).json({ message: 'Education is required' });
+        if (!profession) return res.status(400).json({ message: 'Profession is required' });
+        if (!monthlyIncome) return res.status(400).json({ message: 'Monthly income is required' });
+        if (!companyName) return res.status(400).json({ message: 'Company name is required' });
+        if (!fathersProfession) return res.status(400).json({ message: 'Father\'s profession is required' });
+        if (!numberOfSiblings) return res.status(400).json({ message: 'Number of siblings is required' });
+        if (!nameOfMaternalUncle) return res.status(400).json({ message: 'Name of maternal uncle is required' });
+        if (!address) return res.status(400).json({ message: 'Address is required' });
+        if (!correspondingAddress) return res.status(400).json({ message: 'Corresponding address is required' });
+        if (!maritalStatus) return res.status(400).json({ message: 'Marital status is required' });
+        if (!age) return res.status(400).json({ message: 'Age is required' });
+
+        
+   
+        if (!req.files || !req.files.photograph) {
+            return res.status(400).json({ message: 'Photograph is required' });
+        }
 
         let photograph 
         if(req.files){
@@ -51,10 +84,18 @@ const userSignup = async (req, res) => {
        
 
         // Check for validation errors
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
+
+        // const {errors}=validationresult(req)
+
+        // const {errors} = validationResult(req);
+        // if(errors. length > 0) res.send(errors[0].msg)
+ 
+
+        //const errors = validationResult(req);
+        // if (!errors.isEmpty()) {
+        //     return res.status(400).json({ errors: errors.array() });
+        // // }
+        // Const {errors}=validation result(req)
 
         const existingUser = await userModel.findOne({ email: email })
         if (existingUser) {
@@ -92,6 +133,10 @@ const userSignup = async (req, res) => {
             correspondingAddress,
             maritalStatus,
             age,
+            religion,
+            caste,
+            languages,
+            aboutMe,
             photograph:photographFile?.secure_url
         });
         const token = jwt.sign({ userId: newUser._id }, process.env.SECRET_KEY, { expiresIn: '1d' })
@@ -102,6 +147,7 @@ const userSignup = async (req, res) => {
         return res.status(500).json({ message: error.message })
     }
 }
+
 
 // Route to handle user sign-in
 const userlogin = async (req, res) => {

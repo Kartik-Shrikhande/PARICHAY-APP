@@ -117,7 +117,8 @@ const userProfile = new mongoose.Schema({
         type: String
     },
     photograph: {
-        type: String
+        type: String,
+        required: true
     },
     isSubscribed: {
         type: String,
