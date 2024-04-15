@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const userProfileController = require("../controllers/user.Controller")
+const userController = require("../controllers/user.Controller")
 // const utility = require("../controllers/otp.Controller")
 const Middleware= require("../middleware/middleware")
 const userValidation = require("../validations/validations");
@@ -13,9 +13,9 @@ const upload = multer({ storage:storage});
 router.post('/signup',upload.fields([
     { name:"photograph", maxCount:1}
     ]), 
-    userValidation.userValidationRules(),userProfileController.userSignup)
+    userValidation.userValidationRules(),userController.userSignup)
 
-router.post('/login', userProfileController.userlogin)
+router.post('/login', userController.userlogin)
 
 
 // router.post('/forget', utility.sendEmailVerificationOTP)
@@ -30,17 +30,17 @@ router.post('/login', userProfileController.userlogin)
 
 router.use(Middleware.authentication)
 
-// router.post('/profile', userProfileController.CreateUserProfile)
-router.get('/users', userProfileController.getAllUsers)
-router.get('/user', userProfileController.getUser)
+// router.post('/profile', userController.CreateUserProfile)
+router.get('/users', userController.getAllUsers)
+router.get('/user', userController.getUser)
 
 router.put('/update',upload.fields([
     { name:"photograph", maxCount:1}
-    ]), userProfileController.updateUserProfile)
+    ]), userController.updateUserProfile)
     
-router.delete('/delete', userProfileController.deleteUser)
-router.post('/reset', userProfileController.resetPassword)
-router.get('/prices',userProfileController.pricesList)
-router.post('/subscription',userProfileController.subscription)
+router.delete('/delete', userController.deleteUser)
+router.post('/reset', userController.resetPassword)
+router.get('/prices',userController.pricesList)
+router.post('/subscription',userController.subscription)
 
 module.exports=router;

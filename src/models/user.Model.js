@@ -3,133 +3,154 @@ const mongoose = require("mongoose")
 const userProfile = new mongoose.Schema({
     email: {
         type: String,
-       required: true,
+        required: true,
         unique: true
     },
-    phoneNumber: {
-        type: String,
-      //   required: true
-    },
     password: {
-      type: String,
-    required: true
-  },
+        type: String,
+        required: true
+    },
     title: {
         type: String,
-       //   required: true,
+        required: true,
         enum: ['Mr', 'Miss']
     },
     fullName: {
         type: String,
-      //   required: true
+        required: true
+    },
+    fathersName: {
+        type: String,
+        required: true
+    },
+    phoneNumber: {
+        type: String,
+        required: true
     },
     gender: {
         type: String,
-     //   required: true,
-        enumm: ['Male', 'Female', 'Others']
+        required: true,
+        enum: ['Male', 'Female', 'Others']
     },
     dateOfBirth: {
         type: Date,
-      //   required: true
+        required: true
     },
-    address: {
+    birthTime: {
         type: String,
-    //   required: true
+        required: true
     },
-    profession: {
+    nativePlace: {
         type: String,
-    //   required: true
+        required: true
+    },
+    height: {
+        type: String,
+        required: true
     },
     education: {
         type: String,
-    //   required: true
+        required: true
+    },
+    profession: {
+        type: String,
+        required: true
+    },
+    monthlyIncome: {
+        type: String,
+        required: true
+    },
+    companyName: {
+        type: String,
+        required: true
+    },
+    fathersProfession: {
+        type: String,
+        required: true
+    },
+    numberOfSiblings: {
+        type: {
+            numberOfBrothers: {
+                type: Number,
+                required: true
+            },
+            numberOfSisters: {
+                type: Number,
+                required: true
+            }
+        },
+        required: true
+    },
+    nameOfMaternalUncle: {
+        type: String,
+        required: true
+    },
+    address: {
+        type: String,
+        required: true
+    },
+    correspondingAddress: {
+        type: String,
+        required: true
     },
     maritalStatus: {
         type: String,
         enum: ['Single', 'Divorced', 'Widowed'],
-      //   required: true
+        required: true
     },
     religion: {
         type: String,
-    //   required: true
+        default: 'Hindu'
     },
     caste: {
         type: String,
-    //   required: true
+        default: 'Sutar'
     },
     languages: [{
         type: String,
-    //   required: true
     }],
     age: {
         type: Number,
-    //   required: true
-    },
-    height: {
-        type: String,
-    //   required: true
-    },
-    income: {
-        type: String,
-    //   required: true
+        required: true
     },
     aboutMe: {
         type: String
     },
-    hobbiesAndInterests: {
-        type: [String]
-    },
-    PartnerPreferences: {
-        ageRange: {
-            min: Number,
-            max: Number
-        },
-        height: String,
-        education: String,
-        religion: String,
-        caste: String,
-        languages: String
-    },
     photograph: {
         type: String
     },
-    connections: [{ 
-        type: mongoose.Schema.Types.ObjectId,
-         ref: 'user' 
-    }],
-      pendingRequests: [{ 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'user'
-     }],
-     receivedRequests: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'user'
-    }],
-
-    chatHistory: [{
-        senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
-        receiverId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
-        message: String,
-        timestamp: { type: Date, default: Date.now }
-      }],
-
-      isSubscribed:{
-        type:String,
-        default:"false"
-
-      },
+    isSubscribed: {
+        type: String,
+        default: "false"
+    },
     isDeleted: {
         type: Boolean,
         default: false
     },
-    type:{
+    type: {
         type: String,
-        default:'User'
+        default: 'User'
     },
     token: {
         type: String,
-        // require: true
+    
     }
+
 }, { timestamps: true })
 
 module.exports = mongoose.model('user', userProfile);
+
+// hobbiesAndInterests: {
+//     type: [String]
+// },
+// PartnerPreferences: {
+//     ageRange: {
+//         min: Number,
+//         max: Number
+//     },
+//     height: String,
+//     education: String,
+//     religion: String,
+//     caste: String,
+//     languages: String
+// },
