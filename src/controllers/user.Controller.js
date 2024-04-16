@@ -74,9 +74,9 @@ const userSignup = async (req, res) => {
         //     return res.status(400).json({ message: 'Photograph is required' });
         // }
 
-        // if (!req.files || !req.files.photograph) {
-        //     return res.status(400).json({ message: 'Photograph is required' });
-        // }
+        if (!req.files || !req.files.photograph) {
+            return res.status(400).json({ message: 'Photograph is required' });
+        }
 
 
 
