@@ -116,10 +116,10 @@ const userProfile = new mongoose.Schema({
     aboutMe: {
         type: String
     },
-    photograph: {
+    photograph:[{
         type: String,
         required: true
-    },
+    }],
     isSubscribed: {
         type: String,
         default: "false"

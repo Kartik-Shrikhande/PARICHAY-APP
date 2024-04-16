@@ -74,11 +74,17 @@ const userSignup = async (req, res) => {
             return res.status(400).json({ message: 'Photograph is required' });
         }
 
-        let photograph 
-        if(req.files){
-        //   let{photograph} = req.files
-          photograph=req.files.photograph
+
+        const photographs = [];
+        for (const photo of req.files.photograph) {
+            const photographFile = await cloudinary(photo.buffer);
+            photographs.push(photographFile.secure_url);
         }
+        // let photograph 
+        // if(req.files){
+        // //   let{photograph} = req.files
+        //   photograph=req.files.photograph
+        // }
 
        
 
@@ -103,11 +109,11 @@ const userSignup = async (req, res) => {
         // Hashing the password
         const hashedPassword = await bcrypt.hash(password, 10)
 
-         let photographFile;
+        //  let photographFile=[];
 
-        if (photograph) {
-            photographFile = await cloudinary(photograph[0].buffer);
-        };
+        // if (photograph) {
+        //     photographFile = await cloudinary(photograph[0].buffer);
+        // };
 
         const newUser = await userModel.create({
             email,
@@ -136,7 +142,8 @@ const userSignup = async (req, res) => {
             caste,
             languages,
             aboutMe,
-            photograph:photographFile?.secure_url
+            // photograph:photographFile?.secure_url
+            photograph: photographs
         });
         const token = jwt.sign({ userId: newUser._id }, process.env.SECRET_KEY, { expiresIn: '1d' })
          res.setHeader('token', token);
