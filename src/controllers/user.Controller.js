@@ -163,85 +163,43 @@ const userSignup = async (req, res) => {
 
 
 // Route to handle user sign-in
-const userlogin = async (req, res) => {
-    try {
-
-        // Extracting user input from request body
-        const { email, password } = req.body;
-        if (Object.keys(req.body).length == 0) return res.status(400).send({ status: false, message: "Enter Required Data" })
-
-        // Check if the user exists
-        const user = await userModel.findOne({ email: email });
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid email' });
-        }
-
-        // Verify the password
-        const passwordMatch = await bcrypt.compare(password, user.password);
-        if (!passwordMatch) {
-            return res.status(401).json({ message: 'Invalid password' });
-        }
-
-        // If user credentials are valid, generate JWT token
-        const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '24h' } // Token expires in 24 hour
-        );
-        res.setHeader('Authorization', token);
-        return res.status(200).json({message: 'User login successfully',user:user,token:token});
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-}
-
-
-const resetPassword = async (req, res) => {
-    try {
-        const { email, otp, newPassword } = req.body;
-        const user = await userModel.findOne({ email });
-
-        // Check if user exists and OTP matches
-        if (!user || user.otp !== otp) {
-            return res.status(400).json({ message: 'Invalid OTP or email' });
-        }
-
-        // Hash the new password
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-        // Update user's password and clear OTP
-        user.password = hashedPassword;
-        user.otp = '';
-        await user.save();
-
-        res.json({ message: 'Password reset successfully' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-
 // Route to get all users
 const getAllUsers = async (req, res) => {
     try {
-        const {minAge,maxAge,minHeight,maxHeight,caste,gender,maritalStatus} = req.query
+        const {
+            minAge,maxAge,
+            minSalary,maxSalary,
+            // minHeight,maxHeight,
+            // caste,
+            gender,
+            // maritalStatus
+        } = req.query
         
        let data ={};
        if(minAge && maxAge ){
         data.age ={$gte:minAge,$lte :maxAge}
        };
-    
-       if(minHeight && maxHeight ){
-        data.height ={$gte:minHeight,$lte :maxHeight}
+
+        
+       if(minSalary && maxSalary ){
+        data.monthlyIncome ={$gte:minSalary,$lte :maxSalary}
        };
 
-       if(caste){
-        data.caste=caste
-       };
+    
+    //    if(minHeight && maxHeight ){
+    //     data.height ={$gte:minHeight,$lte :maxHeight}
+    //    };
+
+    //    if(caste){
+    //     data.caste=caste
+    //    };
        
        if(gender){
         data.gender=gender
        };
-       if(maritalStatus){
-        data.maritalStatus=maritalStatus
-       };
+    //    if(maritalStatus){
+    //     data.maritalStatus=maritalStatus
+    //    };
     //    if(education){
     //     data.education= { $in: education };
     //    
@@ -259,6 +217,7 @@ const getAllUsers = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
 
 // Route to get a user by ID
 const getUser = async (req, res) => {
