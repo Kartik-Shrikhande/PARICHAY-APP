@@ -163,6 +163,61 @@ const userSignup = async (req, res) => {
 
 
 // Route to handle user sign-in
+const userlogin = async (req, res) => {
+    try {
+
+        // Extracting user input from request body
+        const { email, password } = req.body;
+        if (Object.keys(req.body).length == 0) return res.status(400).send({ status: false, message: "Enter Required Data" })
+
+        // Check if the user exists
+        const user = await userModel.findOne({ email: email });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid email' });
+        }
+
+        // Verify the password
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+            return res.status(401).json({ message: 'Invalid password' });
+        }
+
+        // If user credentials are valid, generate JWT token
+        const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '24h' } // Token expires in 24 hour
+        );
+        res.setHeader('Authorization', token);
+        return res.status(200).json({message: 'User log successfully',user:user,token:token});
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+
+const resetPassword = async (req, res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+        const user = await userModel.findOne({ email });
+
+        // Check if user exists and OTP matches
+        if (!user || user.otp !== otp) {
+            return res.status(400).json({ message: 'Invalid OTP or email' });
+        }
+
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update user's password and clear OTP
+        user.password = hashedPassword;
+        user.otp = '';
+        await user.save();
+
+        res.json({ message: 'Password reset successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
 // Route to get all users
 const getAllUsers = async (req, res) => {
     try {
@@ -218,12 +273,10 @@ const getAllUsers = async (req, res) => {
     }
 }
 
-
 // Route to get a user by ID
 const getUser = async (req, res) => {
     try {
         const user = req.userId
-       console.log("line 183");
         const findUser = await userModel.findOne({ _id: user, isDeleted: false });
         if (!findUser) {
             return res.status(404).json({ msg: 'user not found' });
@@ -362,9 +415,17 @@ const pricesList = async (req, res) => {
         {plan:'Basic', price:200, subscriptionTiming:'10 days' ,profileVisits:100 },
         {plan:'Economy' ,price:400, subscriptionTiming:'30 days' ,profileVisits:200},
         { plan:'Premium',price:1000, subscriptionTiming:'90 days' ,profileVisits:1000},
-        {admin_name : "Project Name",admin_desc : "Description",admin_contact : "Mobile Number",admin_email : "test@email.com",admin_key : "rzp_test_1DP5mmOlF5G5ag"} 
+      
       ];
-      return res.status(200).json({ status: true, prices: prices})
+
+    const admin_name = "Project Name"
+    const  admin_desc = "Description"
+    const admin_contact = "Mobile Number"
+    const  admin_email = "test@email.com"
+    const admin_key = "rzp_test_1DP5mmOlF5G5ag" 
+
+      return res.status(200).json({ status: true, prices: prices,admin_name:admin_name,admin_desc:admin_desc,admin_contact:admin_contact,
+        admin_email:admin_email, admin_key:admin_key})
     } catch (err) {
       return res.status(500).send({ status: false, message: err.message});
   }
