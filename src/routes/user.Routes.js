@@ -11,7 +11,7 @@ const upload = multer({ storage:storage});
 
 
 router.post('/signup',upload.fields([
-    { name:"photograph", minCount:3}
+    { name:"photograph"}
     ]),userController.userSignup)
 
 router.post('/login', userController.userlogin)
