@@ -74,16 +74,18 @@ const userSignup = async (req, res) => {
         //     return res.status(400).json({ message: 'Photograph is required' });
         // }
 
-        if (!req.files || !req.files.photograph) {
-            return res.status(400).json({ message: 'Photograph is required' });
-        }
+        // if (!req.files || !req.files.photograph) {
+        //     return res.status(400).json({ message: 'Photograph is required' });
+        // }
 
 
 
         const photographs = [];
-        for (const photo of req.files.photograph) {
-            const photographFile = await cloudinary(photo.buffer);
-            photographs.push(photographFile.secure_url);
+        if (req.files && req.files.photograph) {
+            for (const photo of req.files.photograph) {
+                const photographFile = await cloudinary(photo.buffer);
+                photographs.push(photographFile.secure_url);
+            }
         }
         // let photograph 
         // if(req.files){
