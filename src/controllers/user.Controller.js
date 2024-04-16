@@ -70,9 +70,14 @@ const userSignup = async (req, res) => {
 
         
    
+        // if (!req.files || !req.files.photograph) {
+        //     return res.status(400).json({ message: 'Photograph is required' });
+        // }
+
         if (!req.files || !req.files.photograph) {
             return res.status(400).json({ message: 'Photograph is required' });
         }
+
 
 
         const photographs = [];
@@ -316,17 +321,21 @@ const updateUserProfile = async (req, res) => {
         } = req.body
 
             // const {photograph} = req.files
-            
-        let photograph 
-        if(req.files){
-        //   let{photograph} = req.files
-          photograph=req.files.photograph
-        }
-            let photographFile;
+            const photographs = [];
+            for (const photo of req.files.photograph) {
+                const photographFile = await cloudinary(photo.buffer);
+                photographs.push(photographFile.secure_url);
+            }
+        // let photograph 
+        // if(req.files){
+        // //   let{photograph} = req.files
+        //   photograph=req.files.photograph
+        // }
+        //     let photographFile;
 
-            if (photograph) {
-                photographFile = await cloudinary(photograph[0].buffer);
-            };
+        //     if (photograph) {
+        //         photographFile = await cloudinary(photograph[0].buffer);
+        //     };
     
         // if (Object.keys(req.body).length === 0) return res.status(400).send({ status: false, message: "Enter some Data to update" })
 
@@ -335,7 +344,8 @@ const updateUserProfile = async (req, res) => {
             {
                 $set:
                 // email, password, phoneNumber, title, fullName, gender, dateOfBirth, address, profession,
-                // education, caste, age, height, income, 
+           
+            // education, caste, age, height, income, 
                 title,
                 fullName,
                 fathersName,
@@ -356,7 +366,7 @@ const updateUserProfile = async (req, res) => {
                 correspondingAddress,
                 maritalStatus,
                 age,
-                photograph:photographFile?.secure_url
+                photograph: photographs
             },
             { new: true })
         return res.status(200).send({ status: true, message: 'User is updated', update })
@@ -366,7 +376,6 @@ const updateUserProfile = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
-
 
 const deleteUser = async (req, res) => {
     try {
