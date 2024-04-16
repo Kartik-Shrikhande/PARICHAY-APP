@@ -186,7 +186,7 @@ const userlogin = async (req, res) => {
         const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '24h' } // Token expires in 24 hour
         );
         res.setHeader('Authorization', token);
-        return res.status(200).json({data:user,token:token});
+        return res.status(200).json({message: 'User login successfully',user:user,token:token});
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -397,13 +397,13 @@ const deleteUser = async (req, res) => {
     }
 }
 
-
 const pricesList = async (req, res) => {
     try {
       const prices = [
         {plan:'Basic', price:200, subscriptionTiming:'10 days' ,profileVisits:100 },
         {plan:'Economy' ,price:400, subscriptionTiming:'30 days' ,profileVisits:200},
-        { plan:'Premium',price:1000, subscriptionTiming:'90 days' ,profileVisits:1000}  
+        { plan:'Premium',price:1000, subscriptionTiming:'90 days' ,profileVisits:1000},
+        {admin_name : "Project Name",admin_desc : "Description",admin_contact : "Mobile Number",admin_email : "test@email.com",admin_key : "rzp_test_1DP5mmOlF5G5ag"} 
       ];
       return res.status(200).json({ status: true, prices: prices})
     } catch (err) {
