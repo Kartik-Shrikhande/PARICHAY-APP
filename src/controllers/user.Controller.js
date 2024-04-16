@@ -7,7 +7,6 @@ const cloudinary =require('../.config/cloudinary')
 
 
 
-
 const userSignup = async (req, res) => {
     try {
         // const { email, phoneNumber, password, title, fullName, gender, dateOfBirth, address, profession,

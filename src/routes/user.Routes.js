@@ -11,9 +11,8 @@ const upload = multer({ storage:storage});
 
 
 router.post('/signup',upload.fields([
-    { name:"photograph", maxCount:3}
-    ]), 
-    userValidation.userValidationRules(),userController.userSignup)
+    { name:"photograph", minCount:3}
+    ]),userController.userSignup)
 
 router.post('/login', userController.userlogin)
 
@@ -35,7 +34,7 @@ router.get('/users', userController.getAllUsers)
 router.get('/user', userController.getUser)
 
 router.put('/update',upload.fields([
-    { name:"photograph", maxCount:3}
+    { name:"photograph", minCount:3}
     ]), userController.updateUserProfile)
     
 router.delete('/delete', userController.deleteUser)
