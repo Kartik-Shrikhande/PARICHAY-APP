@@ -34,11 +34,11 @@ router.get('/users', userController.getAllUsers)
 router.get('/user', userController.getUser)
 
 router.put('/update',upload.fields([
-    { name:"photograph", minCount:3}
+    { name:"photograph"}
     ]), userController.updateUserProfile)
     
 router.delete('/delete', userController.deleteUser)
-router.post('/reset', userController.resetPassword)
+router.put('/update-Password', userController.updatePassword)
 router.get('/prices',userController.pricesList)
 router.post('/subscription',userController.subscription)
 
