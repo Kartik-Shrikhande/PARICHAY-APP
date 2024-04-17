@@ -38,5 +38,6 @@ router.delete('/delete', userController.deleteUser)
 router.post('/update-password', userController.updatePassword)
 router.get('/prices',userController.pricesList)
 router.post('/subscription',userController.subscription)
+router.get('/user-events',userController.getAllEvents);
 
 module.exports=router;
