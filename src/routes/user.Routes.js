@@ -38,7 +38,7 @@ router.put('/update',upload.fields([
     ]), userController.updateUserProfile)
     
 router.delete('/delete', userController.deleteUser)
-router.put('/update-Password', userController.updatePassword)
+router.post('/update-password', userController.updatePassword)
 router.get('/prices',userController.pricesList)
 router.post('/subscription',userController.subscription)
 

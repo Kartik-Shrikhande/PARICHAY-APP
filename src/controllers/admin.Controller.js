@@ -4,8 +4,6 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 require('dotenv').config({path:'.env'})
 const cloudinary =require('../.config/cloudinary')
-
-const Event = require('../models/event');
 const cloudinary = require('../utils/cloudinary');
 
 const createEvent = async (req, res) => {
@@ -73,7 +71,7 @@ module.exports ={
     // AdminSignup,
     // login,
     createEvent ,
-    
+
     deleteUserById,
 }
 
