@@ -6,6 +6,37 @@ require('dotenv').config({path:'.env'})
 const cloudinary =require('../.config/cloudinary')
 
 
+const adminLogin = async (req, res) => {
+    try {
+        //taking email and password
+        const { email, password } = req.body
+        if (Object.keys(req.body).length == 0) return res.status(400).send({ status: false, message: "Enter Required Data" })
+        // if (!validEmail(email)) return res.status(400).send({ status: false, message: "Enter Valid Email" })
+        // if (!validPassword(password)) return res.status(400).send({ status: false, message: "Enter Valid Password" })
+
+        //checking if email already exist 
+        const login = await userModel.findOne({ email: email ,type:'Admin'})
+        if (!login) return res.status(404).send({ status: false, message: "Entered Email Does not Exist Or Not Admin Email" })
+
+        //Matching given password with original passowrd
+        const pass = bcrypt.compareSync(password, login.password)
+        if (!pass) return res.status(400).send({ status: false, message: "Entered Wrong Password" })
+
+        //Generating jsonwebtoken by signing in user
+        jwt.sign({ userId: login._id }, process.env.SECRET_KEY, { expiresIn: "24hr" }, (error, token) => {
+            if (error) return res.status(400).send({ status: false, message: error.message })
+            res.header('authorization', token)
+        
+            return res.status(200).send({ staus: true, message:"User login Successfully" ,token:token })
+        })
+    }
+    catch (error) {
+        return res.status(500).send({ status: false, message: error.message})
+    }
+}
+
+
+
 const createEvent = async (req, res) => {
     try {
         const { eventName, eventDetails } = req.body;
@@ -168,7 +199,7 @@ const deleteUserById= async (req, res) => {
 }
 module.exports ={
     // AdminSignup,
-    // login,
+    adminLogin,
     createEvent ,
     updateEvent,
     deleteEvent,

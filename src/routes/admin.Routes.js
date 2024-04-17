@@ -8,7 +8,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage:storage});
 
 // router.post('/signup', adminController.AdminSignup)
-// router.post('/login', adminController.login)
+router.post('/login', adminController.adminLogin)
 
 router.post('/create-event',upload.fields([
     { name:"eventPhotograph"}
