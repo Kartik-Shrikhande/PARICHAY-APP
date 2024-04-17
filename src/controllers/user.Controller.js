@@ -390,14 +390,56 @@ const deleteUser = async (req, res) => {
     }
 }
 
+// const updatePassword = async (req, res) => {
+//     try {
+//         const userId = req.userId; // Assuming you have middleware to extract userId from token
+
+//         // Retrieve the current password, new password, and confirm password from the request body
+//         const { currentPassword, newPassword, confirmPassword } = req.body;
+
+//         // Check if all required fields are present
+//         // if (!currentPassword || !newPassword || !confirmPassword) {
+//         //     return res.status(400).json({ message: 'Please provide currentPassword, newPassword, and confirmPassword' });
+//         // }
+
+//         // Find the user in the database based on userId
+//         const user = await userModel.findById(userId);
+
+//         // Check if the user exists
+//         if (!user) {
+//             return res.status(404).json({ message: 'User not found' });
+//         }
+
+//         // Check if the current password matches the password stored in the database
+//         const isPasswordMatch = await bcrypt.compare(currentPassword, user.password);
+//         if (!isPasswordMatch) {
+//             return res.status(400).json({ message: 'Current password is incorrect' });
+//         }
+
+//         // Check if the new password matches the confirm password
+//         if (newPassword !== confirmPassword) {
+//             return res.status(400).json({ message: 'New password and confirm password do not match' });
+//         }
+
+//         // Hash the new password
+//         const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+//         // Update the user's password in the database
+//         user.password = hashedPassword;
+//         await user.save();
+
+//         return res.status(200).json({ message: 'Password updated successfully' });
+//     } catch (error) {
+//         return res.status(500).json({ message: error.message });
+//     }
+// };
+
 const updatePassword = async (req, res) => {
     try {
-        const userId = req.userId; // Assuming you have middleware to extract userId from token
+        const userId = req.userId;
 
-        // Retrieve the current password, new password, and confirm password from the request body
         const { currentPassword, newPassword, confirmPassword } = req.body;
 
-        // Check if all required fields are present
         // if (!currentPassword || !newPassword || !confirmPassword) {
         //     return res.status(400).json({ message: 'Please provide currentPassword, newPassword, and confirmPassword' });
         // }
@@ -420,11 +462,8 @@ const updatePassword = async (req, res) => {
         if (newPassword !== confirmPassword) {
             return res.status(400).json({ message: 'New password and confirm password do not match' });
         }
-
-        // Hash the new password
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-        // Update the user's password in the database
         user.password = hashedPassword;
         await user.save();
 
@@ -433,7 +472,6 @@ const updatePassword = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
-
 
 
 

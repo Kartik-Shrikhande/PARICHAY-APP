@@ -18,13 +18,10 @@ router.post('/login', userController.userlogin)
 
 
 // router.post('/forget', utility.sendEmailVerificationOTP)
-
-
 // //otp
 // router.post('/forgot-password',utility.forgetPassword)
 // router.post('/forgot-password/verify-otp',utility.verifyOtpForForgetPassword)
 // router.post('/verify-otp', utility.verifyOtp)
-
 
 
 router.use(Middleware.authentication)

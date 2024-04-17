@@ -5,9 +5,10 @@ const event = new mongoose.Schema({
         type: String,
         required:true
     },
-   eventPhotograph : {
-        type: String,  
-    },
+   eventPhotograph :[{
+    type: String,
+    // required: true
+}],
     eventDetails: {
         type: String,
     },

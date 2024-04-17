@@ -4,21 +4,20 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 require('dotenv').config({path:'.env'})
 const cloudinary =require('../.config/cloudinary')
-const cloudinary = require('../utils/cloudinary');
+
 
 const createEvent = async (req, res) => {
     try {
         const { eventName, eventDetails } = req.body;
+        
         const photographs = [];
-
         // Upload photographs to Cloudinary
-        if (req.files && req.files.photograph) {
-            for (const photo of req.files.photograph) {
-                const photographFile = await cloudinary.upload(photo.buffer);
+        if (req.files && req.files.eventPhotograph) {
+            for (const photo of req.files.eventPhotograph) {
+                const photographFile = await cloudinary(photo.buffer);
                 photographs.push(photographFile.secure_url);
             }
         }
-
         // Create new event
         const newEvent = await eventModel.create({ eventName, eventPhotograph: photographs, eventDetails });
         return res.status(201).json({ message: 'Event created successfully', event: newEvent });
@@ -27,23 +26,123 @@ const createEvent = async (req, res) => {
     }
 };
 
-module.exports = { createEvent };
 
 
-
-
-const deleteEvent = async (req, res) => {
+const updateEvent = async (req, res) => {
     try {
-        const eventId = req.params.id;
-        await Event.findByIdAndDelete(eventId);
-        return res.status(200).json({ message: 'Event deleted successfully' });
+        const eventId = req.params.id; // Assuming the event ID is passed as a route parameter
+
+        // Retrieve the updated event details from the request body
+        const { eventName, eventDetails } = req.body;
+
+        // Check if the event exists
+        const existingEvent = await eventModel.findById(eventId);
+        if (!existingEvent) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        // Update the event details
+        const update = await eventModel.findOneAndUpdate(
+            { _id: eventId },
+            {
+                $set: {
+                    eventName,
+                    eventDetails
+                }
+            },
+            { new: true }
+        );
+
+        // Upload new photographs to Cloudinary if provided in the request
+        if (req.files && req.files.eventPhotograph) {
+            const photographs = [];
+            for (const photo of req.files.eventPhotograph) {
+                const photographFile = await cloudinary(photo.buffer);
+                photographs.push(photographFile.secure_url);
+            }
+            update.eventPhotograph = photographs;
+            await update.save();
+        }
+
+        return res.status(200).json({ message: 'Event updated successfully', event: update });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
 };
 
+
+const deleteEvent = async (req, res) => {
+    try {
+        const eventId = req.params.id; // Assuming the event ID is passed as a route parameter
+
+        // Check if the event exists
+        const existingEvent = await eventModel.findById(eventId);
+        if (!existingEvent) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        // Check if the event is already deleted
+        if (existingEvent.isDeleted) {
+            return res.status(400).json({ message: 'Event is already deleted' });
+        }
+
+        // Soft delete the event by setting the isDeleted flag to true
+        const updatedEvent = await eventModel.findOneAndUpdate(
+            { _id: eventId },
+            { $set: { isDeleted: true } },
+            { new: true }
+        );
+
+        return res.status(200).json({ message: 'Event deleted successfully', event: updatedEvent });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+
 // Usage:
 // app.delete('/api/events/:id', deleteEvent);
+
+const getAllEvents = async (req, res) => {
+    try {
+        // Find all events that are not deleted
+        const events = await eventModel.find({ isDeleted: false });
+
+        return res.status(200).json({total:events.length, events:events });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+
+
+const getEventById = async (req, res) => {
+    try {
+        const eventId = req.params.id; // Assuming the event ID is passed as a route parameter
+
+        // Find the event by its ID
+        const event = await eventModel.findById(eventId);
+
+        // Check if the event exists
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        // Check if the event is deleted
+        if (event.isDeleted) {
+            return res.status(404).json({ message: 'Event has been deleted' });
+        }
+
+        return res.status(200).json({ event });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+// Define route for getting a specific event by ID
+
+
+// Define route for getting all events
 
 
 
@@ -71,8 +170,11 @@ module.exports ={
     // AdminSignup,
     // login,
     createEvent ,
-
+    updateEvent,
+    deleteEvent,
     deleteUserById,
+    getAllEvents,
+    getEventById
 }
 
 
