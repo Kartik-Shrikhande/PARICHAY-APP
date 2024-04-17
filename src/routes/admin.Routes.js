@@ -3,8 +3,11 @@ const router = express.Router();
 const adminController = require("../controllers/admin.Controller")
 const Middleware= require("../middleware/middleware")
 
-router.post('/signup', adminController.AdminSignup)
-router.post('/login', adminController.login)
+// router.post('/signup', adminController.AdminSignup)
+// router.post('/login', adminController.login)
+
+router.post('create-event', adminController.createEvent)
+
 router.delete('/delete/:userId', adminController.deleteUserById)
 // router.use(Middleware.authentication)
 

@@ -193,29 +193,7 @@ const userlogin = async (req, res) => {
 }
 
 
-const resetPassword = async (req, res) => {
-    try {
-        const { email, otp, newPassword } = req.body;
-        const user = await userModel.findOne({ email });
 
-        // Check if user exists and OTP matches
-        if (!user || user.otp !== otp) {
-            return res.status(400).json({ message: 'Invalid OTP or email' });
-        }
-
-        // Hash the new password
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-        // Update user's password and clear OTP
-        user.password = hashedPassword;
-        user.otp = '';
-        await user.save();
-
-        res.json({ message: 'Password reset successfully' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
 
 
 // Route to get all users
@@ -336,10 +314,13 @@ const updateUserProfile = async (req, res) => {
 
             // const {photograph} = req.files
             const photographs = [];
-            for (const photo of req.files.photograph) {
-                const photographFile = await cloudinary(photo.buffer);
-                photographs.push(photographFile.secure_url);
+            if (req.files && req.files.photograph) {
+                for (const photo of req.files.photograph) {
+                    const photographFile = await cloudinary(photo.buffer);
+                    photographs.push(photographFile.secure_url);
+                }
             }
+   
         // let photograph 
         // if(req.files){
         // //   let{photograph} = req.files
@@ -417,9 +398,9 @@ const updatePassword = async (req, res) => {
         const { currentPassword, newPassword, confirmPassword } = req.body;
 
         // Check if all required fields are present
-        if (!currentPassword || !newPassword || !confirmPassword) {
-            return res.status(400).json({ message: 'Please provide currentPassword, newPassword, and confirmPassword' });
-        }
+        // if (!currentPassword || !newPassword || !confirmPassword) {
+        //     return res.status(400).json({ message: 'Please provide currentPassword, newPassword, and confirmPassword' });
+        // }
 
         // Find the user in the database based on userId
         const user = await userModel.findById(userId);
