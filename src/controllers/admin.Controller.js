@@ -170,18 +170,246 @@ const getEventById = async (req, res) => {
     }
 };
 
-// Define route for getting a specific event by ID
+
+///////done above all
 
 
-// Define route for getting all events
+const adminCreateUser = async (req, res) => {
+    try {
+        // Destructure the required fields from the request body
+        const { email, password, title, fullName, fathersName, phoneNumber, gender, dateOfBirth, birthTime, nativePlace, height, education, profession, monthlyIncome, companyName, fathersProfession, numberOfSiblings, nameOfMaternalUncle, address, correspondingAddress, maritalStatus, age, religion, caste, languages, aboutMe } = req.body;
+
+        // Check if all required fields are present
+        if (!email || !password || !title || !fullName || !fathersName || !phoneNumber || !gender || !dateOfBirth || !birthTime || !nativePlace || !height || !education || !profession || !monthlyIncome || !companyName || !fathersProfession || !numberOfSiblings || !nameOfMaternalUncle || !address || !correspondingAddress || !maritalStatus || !age || !religion || !caste || !languages || !aboutMe) {
+            return res.status(400).json({ message: 'Please provide all required fields' });
+        }
+
+        // Check if the user already exists
+        const existingUser = await userModel.findOne({ email: email });
+        if (existingUser) {
+            return res.status(400).json({ message: 'User with this email already exists' });
+        }
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create the new user
+        const newUser = await userModel.create({
+            email, password: hashedPassword, title, fullName, fathersName, phoneNumber, gender, dateOfBirth, birthTime, nativePlace, height, education, profession, monthlyIncome, companyName, fathersProfession, numberOfSiblings, nameOfMaternalUncle, address, correspondingAddress, maritalStatus, age, religion, caste, languages, aboutMe
+        });
+
+        // Return the success response
+        return res.status(201).json({ message: 'User created successfully', user: newUser });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+
+const adminUpdateUser = async (req, res) => {
+    try {
+        const userId = req.params.id; 
+
+        // Check if the user exists
+        const findUser = await userModel.findById(userId);
+        if (!findUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+
+        // If user profile already exists, update it
+        let { 
+            // email, password, phoneNumber, title, fullName, gender, dateOfBirth, address, profession,
+            // education, caste, age, height, income
+            title,
+            fullName,
+            fathersName,
+            phoneNumber,
+            gender,
+            dateOfBirth,
+            birthTime,
+            nativePlace,
+            height,
+            education,
+            profession,
+            monthlyIncome,
+            companyName,
+            fathersProfession,
+            numberOfSiblings,
+            nameOfMaternalUncle,
+            address,
+            correspondingAddress,
+            maritalStatus,
+            age
+        } = req.body
+
+            // const {photograph} = req.files
+            const photographs = [];
+            if (req.files && req.files.photograph) {
+                for (const photo of req.files.photograph) {
+                    const photographFile = await cloudinary(photo.buffer);
+                    photographs.push(photographFile.secure_url);
+                }
+            }
+   
+      
+
+        // update blog document
+        let update = await userModel.findOneAndUpdate({ _id: userId },
+            {
+                $set:
+              
+                title,
+                fullName,
+                fathersName,
+                phoneNumber,
+                gender,
+                dateOfBirth,
+                birthTime,
+                nativePlace,
+                height,
+                education,
+                profession,
+                monthlyIncome,
+                companyName,
+                fathersProfession,
+                numberOfSiblings,
+                nameOfMaternalUncle,
+                address,
+                correspondingAddress,
+                maritalStatus,
+                age,
+                photograph: photographs
+            },
+            { new: true })
+        return res.status(200).send({ status: true, message: 'User is updated', update })
+    }
+
+    catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+// const adminDeleteUser = async (req, res) => {
+//     try {
+//         const userId = req.params.id; // Assuming the user ID is passed as a route parameter
+
+//         // Check if the user exists
+//         const existingUser = await userModel.findById(userId);
+//         if (!existingUser) {
+//             return res.status(404).json({ message: 'User not found' });
+//         }
+
+//         // Soft delete the user by setting the isDeleted flag to true
+//         existingUser.isDeleted = true;
+//         await existingUser.save();
+
+//         // Return the success response
+//         return res.status(200).json({ message: 'User deleted successfully' });
+//     } catch (error) {
+//         return res.status(500).json({ message: error.message });
+//     }
+// };
+
+const adminGetAllUsers = async (req, res) => {
+    try {
+        const {
+            minAge,maxAge,
+            minSalary,maxSalary,
+            // minHeight,maxHeight,
+            // caste,
+            gender,
+            // maritalStatus
+        } = req.query
+        
+       let data ={};
+       if(minAge && maxAge ){
+        data.age ={$gte:minAge,$lte :maxAge}
+       };
+
+        
+       if(minSalary && maxSalary ){
+        data.monthlyIncome ={$gte:minSalary,$lte :maxSalary}
+       };
+
+
+       if(gender){
+        data.gender=gender
+       };
+
+
+        const users = await userModel.find({ isDeleted: false, ...data });
+        res.status(200).json({ total: users.length, data: users });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
 
 
 
 
+const adminGetUserById = async (req, res) => {
+    try {
+        const userId = req.params.id; // Assuming the user ID is passed as a route parameter
+
+        // Fetch the user by ID
+        const user = await userModel.findById(userId);
+
+        // Check if the user exists and is not deleted
+        if (!user || user.isDeleted) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Return the user details
+        return res.status(200).json({ user: user });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+
+
+// const getUserById= async (req, res) => {
+//     try {
+//         const user =req.params.id
+        
+//       const findUser  = await userModel.findById(user);
+//       if (!findUser) {
+//         return res.status(404).json({ msg: 'user not found' }); 
+//     }
+//     if (findUser.isDeleted==true) return res.status(400).send({ status: false, message: "User is already Deleted" })
+//         //deleting blog by its Id 
+//     const deleteUser = await userModel.findOneAndUpdate({ _id: user, isDeleted: false }, { $set: { isDeleted: true } })
+//         return res.status(200).send({ status: true, message: "User is deleted" })
+
+//     } catch (error) {
+//         res.status(500).json({ message: error.message });
+//     }
+
+//}
+
+const updateUserById= async (req, res) => {
+    try {
+    //     const user =req.params.userId
+        
+    //   const findUser  = await userModel.findById(user);
+    //   if (!findUser) {
+    //     return res.status(404).json({ msg: 'user not found' }); 
+    // }
+    // if (findUser.isDeleted==true) return res.status(400).send({ status: false, message: "User is already Deleted" })
+    //     //deleting blog by its Id 
+    // const deleteUser = await userModel.findOneAndUpdate({ _id: user, isDeleted: false }, { $set: { isDeleted: true } })
+    //     return res.status(200).send({ status: true, message: "User is deleted" })
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+
+}
 
 const deleteUserById= async (req, res) => {
     try {
-        const user =req.params.userId
+        const user =req.params.id
         
       const findUser  = await userModel.findById(user);
       if (!findUser) {
@@ -197,15 +425,21 @@ const deleteUserById= async (req, res) => {
     }
 
 }
+
+
 module.exports ={
     // AdminSignup,
     adminLogin,
     createEvent ,
     updateEvent,
     deleteEvent,
-    deleteUserById,
     getAllEvents,
-    getEventById
+    getEventById,
+    adminCreateUser,
+    adminUpdateUser,
+    adminGetAllUsers,
+    adminGetUserById,
+    deleteUserById,
 }
 
 

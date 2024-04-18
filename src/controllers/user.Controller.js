@@ -1,5 +1,4 @@
 const userModel = require("../models/user.Model")
-const eventModel =require("../models/event.model")
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 require('dotenv').config({ path: '.env' })
@@ -528,13 +527,7 @@ const pricesList = async (req, res) => {
   const getAllEvents = async (req, res) => {
     try {
 
-        const userId = req.userId;
-
-        // Check if the user exists
-        const findUser = await userModel.findById(userId);
-        if (!findUser) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+        
         // Find all events that are not deleted
         const events = await eventModel.find({ isDeleted: false });
 

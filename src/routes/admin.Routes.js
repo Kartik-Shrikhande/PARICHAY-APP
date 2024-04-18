@@ -10,6 +10,9 @@ const upload = multer({ storage:storage});
 // router.post('/signup', adminController.AdminSignup)
 router.post('/login', adminController.adminLogin)
 
+
+
+//////EVENT/////////
 router.post('/create-event',upload.fields([
     { name:"eventPhotograph"}
     ]), adminController.createEvent)
@@ -24,7 +27,19 @@ router.get('/events',adminController.getAllEvents);
 router.get('/event/:id',adminController.getEventById);
 
 
-router.delete('/delete/:userId', adminController.deleteUserById)
+
+///////admin-users////////////////////////////////////////////////
+router.post('/create-user', adminController.adminCreateUser)
+router.put('/update-user/:id',upload.fields([
+    { name:"photograph"}
+    ]), adminController.adminUpdateUser)
+
+ router.get('/users', adminController.adminGetAllUsers)  
+ router.get('/user/:id', adminController.adminGetUserById)  
+router.delete('/user-delete/:id', adminController.deleteUserById)
+
+
+
 
 // router.use(Middleware.authentication)
 
