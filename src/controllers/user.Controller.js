@@ -1,4 +1,5 @@
 const userModel = require("../models/user.Model")
+const eventModel =require("../models/event.model")
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 require('dotenv').config({ path: '.env' })
