@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const adminController = require("../controllers/admin.Controller")
+const commmunityController = require("../controllers/communityController")
 // const Middleware= require("../middleware/middleware")
 
 const multer = require('multer');
@@ -38,10 +39,19 @@ router.put('/update-user/:id',upload.fields([
  router.get('/user/:id', adminController.adminGetUserById)  
 router.delete('/user-delete/:id', adminController.deleteUserById)
 
-
-
-
 // router.use(Middleware.authentication)
+
+///////community Members //////////////////////
+router.post('/create-member',upload.fields([
+    { name:"photograph"}
+    ]),commmunityController.createCommunityMember)
+
+
+router.put('/update-member/:id',upload.fields([
+        { name:"photograph"}
+        ]), commmunityController.updateCommunityMember)
+
+router.delete('/delete-member/:id', commmunityController.deleteCommunityMember)
 
 
 module.exports=router;

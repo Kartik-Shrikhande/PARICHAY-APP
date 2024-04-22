@@ -36,7 +36,6 @@ const adminLogin = async (req, res) => {
 }
 
 
-
 const createEvent = async (req, res) => {
     try {
         const { eventName, eventDetails } = req.body;
@@ -367,45 +366,6 @@ const adminGetUserById = async (req, res) => {
     }
 };
 
-
-
-// const getUserById= async (req, res) => {
-//     try {
-//         const user =req.params.id
-        
-//       const findUser  = await userModel.findById(user);
-//       if (!findUser) {
-//         return res.status(404).json({ msg: 'user not found' }); 
-//     }
-//     if (findUser.isDeleted==true) return res.status(400).send({ status: false, message: "User is already Deleted" })
-//         //deleting blog by its Id 
-//     const deleteUser = await userModel.findOneAndUpdate({ _id: user, isDeleted: false }, { $set: { isDeleted: true } })
-//         return res.status(200).send({ status: true, message: "User is deleted" })
-
-//     } catch (error) {
-//         res.status(500).json({ message: error.message });
-//     }
-
-//}
-
-const updateUserById= async (req, res) => {
-    try {
-    //     const user =req.params.userId
-        
-    //   const findUser  = await userModel.findById(user);
-    //   if (!findUser) {
-    //     return res.status(404).json({ msg: 'user not found' }); 
-    // }
-    // if (findUser.isDeleted==true) return res.status(400).send({ status: false, message: "User is already Deleted" })
-    //     //deleting blog by its Id 
-    // const deleteUser = await userModel.findOneAndUpdate({ _id: user, isDeleted: false }, { $set: { isDeleted: true } })
-    //     return res.status(200).send({ status: true, message: "User is deleted" })
-
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-
-}
 
 const deleteUserById= async (req, res) => {
     try {

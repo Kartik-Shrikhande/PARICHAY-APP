@@ -40,4 +40,6 @@ router.get('/prices',userController.pricesList)
 router.post('/subscription',userController.subscription)
 router.get('/user-events',userController.getAllEvents);
 
+
+
 module.exports=router;
