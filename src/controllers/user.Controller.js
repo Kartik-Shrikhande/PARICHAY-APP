@@ -1,5 +1,6 @@
 const userModel = require("../models/user.Model")
 const eventModel =require("../models/event.model")
+const communityModel  =require("../models/comminityModel")
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 require('dotenv').config({ path: '.env' })
@@ -539,6 +540,25 @@ const pricesList = async (req, res) => {
 };
 
 
+const getCommunityMembers = async (req, res) => {
+    try {
+
+        const user = req.userId
+        const findUser = await userModel.findById(user);
+        if (!findUser) {
+            return res.status(404).json({ msg: 'user not found' });
+        }
+        // Retrieve all community members that have not been marked as deleted
+        const members = await communityModel.find({ isDeleted: false });
+
+        // Return the list of community members in the response
+        return res.status(200).json({ total: members.length, members });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+
   
 module.exports = {
     userSignup,
@@ -551,7 +571,8 @@ module.exports = {
     updatePassword,
     pricesList,
     subscription,
-    getAllEvents
+    getAllEvents,
+    getCommunityMembers
 }
 
 

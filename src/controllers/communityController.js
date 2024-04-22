@@ -104,11 +104,25 @@ const deleteCommunityMember = async (req, res) => {
     }
 };
 
+const getCommunityMembers = async (req, res) => {
+    try {
+        // Retrieve all community members that have not been marked as deleted
+        const members = await communityModel.find({ isDeleted: false });
+
+        // Return the list of community members in the response
+        return res.status(200).json({ total: members.length, members });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+
 
 module.exports ={
   createCommunityMember,
   updateCommunityMember,
-  deleteCommunityMember
+  deleteCommunityMember,
+  getCommunityMembers
 }
 
 

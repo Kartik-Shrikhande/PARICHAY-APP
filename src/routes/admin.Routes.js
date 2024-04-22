@@ -52,6 +52,6 @@ router.put('/update-member/:id',upload.fields([
         ]), commmunityController.updateCommunityMember)
 
 router.delete('/delete-member/:id', commmunityController.deleteCommunityMember)
-
+router.get('/members', commmunityController.getCommunityMembers)
 
 module.exports=router;
