@@ -12,10 +12,10 @@ const generateOTP = () => {
 
 const sendOTPByEmail = async (recipientEmail, otp) => {
     try {
-        sgMail.setApiKey('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');
+        sgMail.setApiKey(process.env.SENDGRIDKEY);
         const msg = {
             to: recipientEmail,
-            from: 'anuj.tembhurne@avestantechnologies.com', // Use the email address or domain you verified with SendGrid
+            from: process.env.EMAIL, // Use the email address or domain you verified with SendGrid
             subject: 'OTP for Email Verification',
             text: `Your OTP for email verification is ${otp}`,
             html: `<strong>Your OTP for email verification is ${otp}</strong>`,
