@@ -5,7 +5,8 @@ const Middleware = require("../middleware/middleware")
 
 
 router.post('/otp', otpController.otpSent)
-router.put('/new-password', otpController.setNewPassword)
+router.post('/verify',otpController.verifyOTP)
+router.put('/new-password', otpController.resetPassword)
 
 
 module.exports = router;
