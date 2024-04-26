@@ -15,7 +15,7 @@ const sendOTPByEmail = async (recipientEmail, otp) => {
         sgMail.setApiKey(process.env.SENDGRIDKEY);
         const msg = {
             to: recipientEmail,
-            from: process.env.EMAIL, // Use the email address or domain you verified with SendGrid
+            from:process.env.EMAIL, 
             subject: 'OTP for Email Verification',
             text: `Your OTP for email verification is ${otp}`,
             html: `<strong>Your OTP for email verification is ${otp}</strong>`,
@@ -31,15 +31,11 @@ const sendOTPByEmail = async (recipientEmail, otp) => {
 
 
 
+
 // API endpoint for requesting password reset OTP
 const otpSent = async (req, res) => {
     try {
 
-        const userId = req.userId;
-        const findUser = await userModel.findById(userId);
-        if (!findUser) {
-            return res.status(404).json({ message: 'Invalid User' });
-        }
         const { email } = req.body;
         const user = await userModel.findOne({ email: email });
         if (!user) {
@@ -59,13 +55,7 @@ const otpSent = async (req, res) => {
 }
 const setNewPassword = async (req, res) => {
     try {
-        const userId = req.userId;
-        const findUser = await userModel.findById(userId);
-        if (!findUser) {
-            return res.status(404).json({ message: 'Invalid User' });
-        }
 
-        // Fetching email and OTP ID from the database using the user's ID
         const { email, newPassword,otp } = req.body;
         if (!email) return res.status(400).json({ message: 'Enter Email' })
         if (!newPassword) return res.status(400).json({ message: 'Enter newPassword' })
