@@ -13,7 +13,7 @@ const subscriptionModel = require('../models/subscription.model')
 
 const userSignup = async (req, res) => {
     const errors = validationResult(req)
-    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() })
+    if (!errors.isEmpty()) return res.status(400).json({ status: false, errors: errors.array() })
     try {
         const {
             email,
@@ -53,7 +53,7 @@ const userSignup = async (req, res) => {
             }
         }
         const existingUser = await userModel.findOne({ email: email })
-        if (existingUser) return res.status(400).json({ message: 'User with this email already exists' })
+        if (existingUser) return res.status(400).json({ status: false, message: 'User with this email already exists' })
         // Hashing the password
         const hashedPassword = await bcrypt.hash(password, 10)
         const newUser = await userModel.create({
@@ -87,10 +87,10 @@ const userSignup = async (req, res) => {
         });
         const token = jwt.sign({ userId: newUser._id }, process.env.SECRET_KEY, { expiresIn: '1d' })
         res.setHeader('token', token);
-        return res.status(201).json({ message: 'User created successfully', user: newUser, token: token })
+        return res.status(201).json({ status: true, message: 'User created successfully', user: newUser, token: token })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -106,19 +106,19 @@ const userlogin = async (req, res) => {
 
         // Check if the user exists
         const user = await userModel.findOne({ email: email })
-        if (!user) return res.status(401).json({ message: 'Invalid email' })
+        if (!user) return res.status(401).json({ status: false, message: 'Invalid email' })
 
         // Verify the password
         const passwordMatch = await bcrypt.compare(password, user.password);
-        if (!passwordMatch) return res.status(401).json({ message: 'Invalid password' })
+        if (!passwordMatch) return res.status(401).json({ status: false, message: 'Invalid password' })
 
         // If user credentials are valid, generate JWT token
         const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '24h' })
         res.setHeader('Authorization', token);
-        return res.status(200).json({ message: 'User log successfully', token: token })
+        return res.status(200).json({ status: true, message: 'User log successfully', token: token })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -152,10 +152,10 @@ const getAllUsers = async (req, res) => {
             data.gender = gender
         };
         const users = await userModel.find({ isDeleted: false, ...data })
-        return res.status(200).json({ total: users.length, data: users })
+        return res.status(200).json({ status: true, total: users.length, data: users })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -167,11 +167,11 @@ const getUser = async (req, res) => {
     try {
         const user = req.userId
         const findUser = await userModel.findOne({ _id: user, isDeleted: false })
-        if (!findUser) return res.status(404).json({ msg: 'user not found' })
-        return res.status(200).json(findUser)
+        if (!findUser) return res.status(404).json({ status: false, msg: 'user not found' })
+        return res.status(200).json({ status: true, user: findUser })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -184,10 +184,10 @@ const updateUserProfile = async (req, res) => {
         const userId = req.userId
         // Check if the user exists
         const findUser = await userModel.findById(userId);
-        if (!findUser) return res.status(404).json({ message: 'User not found' })
+        if (!findUser) return res.status(404).json({ status: false, message: 'User not found' })
         // Check if the user profile exists
         let userProfile = await userModel.findById(userId);
-        if (!userProfile) return res.status(404).json({ message: 'User Profile not found' })
+        if (!userProfile) return res.status(404).json({ status: false, message: 'User Profile not found' })
         // If user profile doesn't exist, create a new one
         // If user profile already exists, update it
         let {
@@ -250,7 +250,7 @@ const updateUserProfile = async (req, res) => {
         return res.status(200).json({ status: true, message: 'User updated Successfully', update })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -262,14 +262,14 @@ const deleteUser = async (req, res) => {
     try {
         const user = req.userId
         const findUser = await userModel.findById(user);
-        if (!findUser) return res.status(404).json({ msg: 'user not found' })
+        if (!findUser) return res.status(404).json({ status: false, msg: 'user not found' })
         if (findUser.isDeleted == true) return res.status(400).json({ status: false, message: "User is already Deleted" })
         //deleting blog by its Id 
         const deleteUser = await userModel.findOneAndUpdate({ _id: user, isDeleted: false }, { $set: { isDeleted: true } })
         return res.status(200).json({ status: true, message: "User is deleted" })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -282,32 +282,32 @@ const updatePassword = async (req, res) => {
         const userId = req.userId
         const { currentPassword, newPassword, confirmPassword } = req.body
         if (!currentPassword || !newPassword || !confirmPassword) {
-            return res.status(400).json({ message: 'Please provide currentPassword, newPassword, and confirmPassword' })
+            return res.status(400).json({ status: false, message: 'Please provide currentPassword, newPassword, and confirmPassword' })
         }
         //validating password length
         let length = newPassword.length
-        if (length < 8 || length > 14) return res.status(400).json({ message: 'Password must be between 8 and 14 characters long' })
+        if (length < 8 || length > 14) return res.status(400).json({ status: false, message: 'Password must be between 8 and 14 characters long' })
         // Find the user in the database based on userId
         const user = await userModel.findById(userId);
 
         // Check if the user exists
-        if (!user) return res.status(404).json({ message: 'User not found' })
+        if (!user) return res.status(404).json({ status: false, message: 'User not found' })
         // Check if the current password matches the password stored in the database
         const isPasswordMatch = await bcrypt.compare(currentPassword, user.password)
         if (!isPasswordMatch) {
-            return res.status(400).json({ message: 'Current password is incorrect' })
+            return res.status(400).json({ status: false, message: 'Current password is incorrect' })
         }
         // Check if the new password matches the confirm password
         if (newPassword !== confirmPassword) {
-            return res.status(400).json({ message: 'New password and confirm password do not match' })
+            return res.status(400).json({ status: false, message: 'New password and confirm password do not match' })
         }
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         user.password = hashedPassword;
         await user.save();
-        return res.status(200).json({ message: 'Password updated successfully' })
+        return res.status(200).json({ status: true, message: 'Password updated successfully' })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -330,8 +330,13 @@ const pricesList = async (req, res) => {
         const admin_key = "rzp_test_1DP5mmOlF5G5ag"
 
         return res.status(200).json({
-            status: true, prices: prices, admin_name: admin_name, admin_desc: admin_desc, admin_contact: admin_contact,
-            admin_email: admin_email, admin_key: admin_key
+            status: true,
+            prices: prices,
+            admin_name: admin_name,
+            admin_desc: admin_desc,
+            admin_contact: admin_contact,
+            admin_email: admin_email,
+            admin_key: admin_key
         })
     }
     catch (err) {
@@ -347,16 +352,16 @@ const subscription = async (req, res) => {
     try {
         const user = req.userId
         const findUser = await userModel.findById(user);
-        if (!findUser) return res.status(404).json({ msg: 'user not found' })
+        if (!findUser) return res.status(404).json({ status: false, msg: 'user not found' })
 
         const { price } = req.body
         const validPrices = [200, 400, 1000]
-        if (!validPrices.includes(price)) return res.status(400).json({ msg: 'Invalid price : Availables plans are 200, 400, and 1000' })
+        if (!validPrices.includes(price)) return res.status(400).json({ status: false, msg: 'Invalid price : Availables plans are 200, 400, and 1000' })
 
         findUser.isSubscribed = "true"
         await findUser.save()
         const subscription = await subscriptionModel.create({ userId: user, price, })
-        return res.status(200).json({ message: 'Subscription added for user', subscription: subscription })
+        return res.status(200).json({ status: true, message: 'Subscription added for user', subscription: subscription })
     }
     catch (err) {
         return res.status(500).json({ status: false, message: err.message })
@@ -370,10 +375,10 @@ const subscription = async (req, res) => {
 const getAllEvents = async (req, res) => {
     try {
         const events = await eventModel.find({ isDeleted: false })
-        return res.status(200).json({ total: events.length, events: events })
+        return res.status(200).json({ status: true, total: events.length, events: events })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -385,14 +390,14 @@ const getCommunityMembers = async (req, res) => {
     try {
         const user = req.userId
         const findUser = await userModel.findById(user)
-        if (!findUser) return res.status(404).json({ msg: 'user not found' })
+        if (!findUser) return res.status(404).json({ status: false, msg: 'user not found' })
         // Retrieve all community members that have not been marked as deleted
         const members = await communityModel.find({ isDeleted: false })
         // Return the list of community members in the response
-        return res.status(200).json({ total: members.length, members })
+        return res.status(200).json({ status: true, total: members.length, members })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 

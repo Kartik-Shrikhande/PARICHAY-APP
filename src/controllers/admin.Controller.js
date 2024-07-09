@@ -51,10 +51,10 @@ const createEvent = async (req, res) => {
             }
         }
         const newEvent = await eventModel.create({ eventName, eventPhotograph: photograph, eventDetails })
-        return res.status(201).json({ message: 'Event created successfully', event: newEvent })
+        return res.status(201).json({ status: true, message: 'Event created successfully', event: newEvent })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -70,7 +70,7 @@ const updateEvent = async (req, res) => {
         const { eventName, eventDetails } = req.body
         // Check if the event exists
         const existingEvent = await eventModel.findById(eventId)
-        if (!existingEvent) return res.status(404).json({ message: 'Event not found' })
+        if (!existingEvent) return res.status(404).json({ status: false, message: 'Event not found' })
 
         // Update the event details
         const update = await eventModel.findOneAndUpdate({ _id: eventId }, { $set: { eventName, eventDetails } }, { new: true })
@@ -85,10 +85,10 @@ const updateEvent = async (req, res) => {
             update.eventPhotograph = photographs
             await update.save()
         }
-        return res.status(200).json({ message: 'Event updated successfully', event: update })
+        return res.status(200).json({ status: true, message: 'Event updated successfully', event: update })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -102,17 +102,17 @@ const deleteEvent = async (req, res) => {
         const eventId = req.params.id// Assuming the event ID is passed as a route parameter
         // Check if the event exists
         const existingEvent = await eventModel.findById(eventId)
-        if (!existingEvent) return res.status(404).json({ message: 'Event not found' })
+        if (!existingEvent) return res.status(404).json({ status: false, message: 'Event not found' })
 
         // Check if the event is already deleted
-        if (existingEvent.isDeleted) return res.status(400).json({ message: 'Event is already deleted' })
+        if (existingEvent.isDeleted) return res.status(400).json({ status: false, message: 'Event is already deleted' })
 
         // Soft delete the event by setting the isDeleted flag to true
         const updatedEvent = await eventModel.findOneAndUpdate({ _id: eventId }, { $set: { isDeleted: true } }, { new: true })
-        return res.status(200).json({ message: 'Event deleted successfully' })
+        return res.status(200).json({ status: true, message: 'Event deleted successfully' })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -124,10 +124,10 @@ const deleteEvent = async (req, res) => {
 const getAllEvents = async (req, res) => {
     try {
         const events = await eventModel.find({ isDeleted: false })
-        return res.status(200).json({ total: events.length, events: events })
+        return res.status(200).json({ status: true, total: events.length, events: events })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -142,13 +142,13 @@ const getEventById = async (req, res) => {
         // Find the event by its ID
         const event = await eventModel.findById(eventId)
         // Check if the event exists
-        if (!event) return res.status(404).json({ message: 'Event not found' })
+        if (!event) return res.status(404).json({ status: false, message: 'Event not found' })
         // Check if the event is deleted
-        if (event.isDeleted) return res.status(404).json({ message: 'Event Not Found' })
-        return res.status(200).json({ event })
+        if (event.isDeleted) return res.status(404).json({ status: false, message: 'Event Not Found' })
+        return res.status(200).json({ status: true, event: event })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -194,12 +194,12 @@ const adminCreateUser = async (req, res) => {
             || !birthTime || !nativePlace || !height || !education || !profession || !monthlyIncome || !companyName ||
             !fathersProfession || !numberOfSiblings || !nameOfMaternalUncle || !address || !correspondingAddress || !maritalStatus ||
             !age || !religion || !caste || !languages || !aboutMe) {
-            return res.status(400).json({ message: 'Please provide all required fields' })
+            return res.status(400).json({ status: false, message: 'Please provide all required fields' })
         }
 
         // Check if the user already exists
         const existingUser = await userModel.findOne({ email: email })
-        if (existingUser) return res.status(400).json({ message: 'User with this email already exists' })
+        if (existingUser) return res.status(400).json({ status: false, message: 'User with this email already exists' })
 
         let passLength = password.length
         if (passLength < 8 || passLength > 14) return res.status(400).json({ status: false, message: 'Password must be between 8 and 14 characters long' })
@@ -234,10 +234,10 @@ const adminCreateUser = async (req, res) => {
             languages,
             aboutMe
         })
-        return res.status(201).json({ message: 'User created successfully', user: newUser })
+        return res.status(201).json({ status: true, message: 'User created successfully', user: newUser })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -251,7 +251,7 @@ const adminUpdateUser = async (req, res) => {
         const userId = req.params.id
         // Check if the user exists
         const findUser = await userModel.findById(userId)
-        if (!findUser) return res.status(404).json({ message: 'User not found' })
+        if (!findUser) return res.status(404).json({ status: false, message: 'User not found' })
         // If user profile already exists, update it
         let {
             title,
@@ -311,7 +311,7 @@ const adminUpdateUser = async (req, res) => {
         return res.status(200).json({ status: true, message: 'User is updated', update })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -345,10 +345,10 @@ const adminGetAllUsers = async (req, res) => {
             data.gender = gender
         }
         const users = await userModel.find({ isDeleted: false, ...data })
-        return res.status(200).json({ total: users.length, data: users })
+        return res.status(200).json({ status: true, total: users.length, data: users })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -362,11 +362,11 @@ const adminGetUserById = async (req, res) => {
         const userId = req.params.id
         const user = await userModel.findById(userId)
         // Check if the user exists and is not deleted
-        if (!user || user.isDeleted) return res.status(404).json({ message: 'User not found' })
-        return res.status(200).json({ user: user })
+        if (!user || user.isDeleted) return res.status(404).json({ status: false, message: 'User not found' })
+        return res.status(200).json({ status: true, user: user })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -379,14 +379,14 @@ const deleteUserById = async (req, res) => {
     try {
         const user = req.params.id
         const findUser = await userModel.findById(user)
-        if (!findUser) return res.status(404).json({ msg: 'user not found' })
+        if (!findUser) return res.status(404).json({ status: false, msg: 'user not found' })
         if (findUser.isDeleted == true) return res.status(400).json({ status: false, message: "User is already Deleted" })
         //deleting blog by its Id 
         const deleteUser = await userModel.findOneAndUpdate({ _id: user, isDeleted: false }, { $set: { isDeleted: true } })
         return res.status(200).json({ status: true, message: "User is deleted" })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 

@@ -40,17 +40,17 @@ const otpSent = async (req, res) => {
     try {
         const { email } = req.body
         const user = await userModel.findOne({ email: email })
-        if (!user) return res.status(404).json({ message: 'Email not found' })
+        if (!user) return res.status(404).json({ status: false, message: 'Email not found' })
 
         const otp = generateOTP()
         console.log(otp)
 
         await sendOTPByEmail(email, otp);
         const otpRecord = await otpModel.create({ email, otp, date: new Date().getTime() })
-        return res.status(200).json({ message: 'OTP sent successfully', data: { otpId: otpRecord._id, email } })
+        return res.status(200).json({ status: true, message: 'OTP sent successfully', data: { otpId: otpRecord._id, email } })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: true, message: error.message })
     }
 }
 
@@ -63,14 +63,14 @@ const verifyOTP = async (req, res) => {
         const { email, otp } = req.body
         // Fetch the OTP record based on the user's email
         const otpRecord = await otpModel.findOne({ email })
-        if (!otpRecord) return res.status(404).json({ message: 'please re-generate OTP' })
+        if (!otpRecord) return res.status(404).json({ status: false, message: 'please re-generate OTP' })
         // Verify the OTP
-        if (otpRecord.otp !== otp) return res.status(400).json({ message: 'Invalid OTP' })
+        if (otpRecord.otp !== otp) return res.status(400).json({ status: false, message: 'Invalid OTP' })
         // OTP is verified successfully
-        return res.status(200).json({ message: 'OTP verified successfully' })
+        return res.status(200).json({ status: true, message: 'OTP verified successfully' })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -83,23 +83,23 @@ const resetPassword = async (req, res) => {
     try {
         const { email, newPassword } = req.body
         const user = await userModel.findOne({ email })
-        if (!user) return res.status(404).json({ message: 'User not found' })
+        if (!user) return res.status(404).json({ status: false, message: 'User not found' })
 
         let passLength = newPassword.length
         if (passLength < 8 || passLength > 14) return res.status(400).json({ status: false, message: 'Password must be between 8 and 14 characters long' })
 
         const otpRecord = await otpModel.findOne({ email: email })
-        if (!otpRecord) return res.status(404).json({ message: 'please verify OTP' })
+        if (!otpRecord) return res.status(404).json({ status: false, message: 'please verify OTP' })
 
         // Hash the new password
         const hashedPassword = await bcrypt.hash(newPassword, 10)
         user.password = hashedPassword;
         await user.save();
         await otpRecord.deleteOne();
-        return res.status(200).json({ message: 'Password reset successfully' })
+        return res.status(200).json({ status: true, message: 'Password reset successfully' })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 

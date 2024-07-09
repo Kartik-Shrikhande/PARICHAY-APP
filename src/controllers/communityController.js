@@ -9,8 +9,8 @@ const cloudinary = require('../.config/cloudinary')
 const createCommunityMember = async (req, res) => {
     try {
         const { memberName, position } = req.body
-        if (!memberName) return res.status(404).json({ message: 'Enter Member Name' })
-        if (!position) return res.status(404).json({ message: 'Enter Position' })
+        if (!memberName) return res.status(404).json({ status: false, message: 'Enter Member Name' })
+        if (!position) return res.status(404).json({ status: false, message: 'Enter Position' })
         // Prepare the photographs array
         const photographs = []
         if (req.files && req.files.photograph) {
@@ -20,10 +20,10 @@ const createCommunityMember = async (req, res) => {
             }
         }
         const newMember = await communityModel.create({ memberName, photograph: photographs, position })
-        return res.status(201).json({ message: 'Community member created successfully', member: newMember })
+        return res.status(201).json({ status: true, message: 'Community member created successfully', member: newMember })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -39,7 +39,7 @@ const updateCommunityMember = async (req, res) => {
         const { memberName, position } = req.body
         // Check if the member exists
         const existingMember = await communityModel.findById(memberId)
-        if (!existingMember) return res.status(404).json({ message: 'Community member not found' });
+        if (!existingMember) return res.status(404).json({ status: false, message: 'Community member not found' });
         // Update the member details
         const update = await communityModel.findOneAndUpdate({ _id: memberId }, { $set: { memberName, position } }, { new: true })
         // Upload new photographs to Cloudinary if provided in the request
@@ -52,10 +52,10 @@ const updateCommunityMember = async (req, res) => {
             update.photograph = photographs
             await update.save()
         }
-        return res.status(200).json({ message: 'Community member updated successfully', member: update })
+        return res.status(200).json({ status: true, message: 'Community member updated successfully', member: update })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -69,17 +69,17 @@ const deleteCommunityMember = async (req, res) => {
         const memberId = req.params.id
         // Check if the member exists
         const existingMember = await communityModel.findById(memberId)
-        if (!existingMember) return res.status(404).json({ message: 'Community member not found' })
+        if (!existingMember) return res.status(404).json({ status: false, message: 'Community member not found' })
 
         // Check if the member is already deleted
-        if (existingMember.isDeleted) return res.status(400).json({ message: 'Community member is already deleted' })
+        if (existingMember.isDeleted) return res.status(400).json({ status: false, message: 'Community member is already deleted' })
 
         // Soft delete the member by setting the isDeleted flag to true
         const updatedMember = await communityModel.findOneAndUpdate({ _id: memberId }, { $set: { isDeleted: true } }, { new: true })
-        return res.status(200).json({ message: 'Community member deleted successfully' })
+        return res.status(200).json({ status: true, message: 'Community member deleted successfully' })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
@@ -93,10 +93,10 @@ const getCommunityMembers = async (req, res) => {
         // Retrieve all community members that have not been marked as deleted
         const members = await communityModel.find({ isDeleted: false })
         // Return the list of community members in the response
-        return res.status(200).json({ total: members.length, members })
+        return res.status(200).json({ status: true, total: members.length, members })
     }
     catch (error) {
-        return res.status(500).json({ message: error.message })
+        return res.status(500).json({ status: false, message: error.message })
     }
 }
 
