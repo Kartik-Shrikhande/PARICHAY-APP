@@ -1,5 +1,6 @@
 const mongoose = require("mongoose")
 
+
 const userProfile = new mongoose.Schema({
     email: {
         type: String,
@@ -45,7 +46,7 @@ const userProfile = new mongoose.Schema({
         required: true
     },
     height: {
-        type: String,
+        type: Number,
         required: true
     },
     education: {
@@ -57,7 +58,7 @@ const userProfile = new mongoose.Schema({
         required: true
     },
     monthlyIncome: {
-        type: String,
+        type: Number,
         required: true
     },
     companyName: {
@@ -116,9 +117,8 @@ const userProfile = new mongoose.Schema({
     aboutMe: {
         type: String
     },
-    photograph:[{
+    photographs: [{
         type: String,
-        // required: true
     }],
     isSubscribed: {
         type: String,
@@ -134,24 +134,12 @@ const userProfile = new mongoose.Schema({
     },
     token: {
         type: String,
-    
+
     }
 
 }, { timestamps: true })
 
-module.exports = mongoose.model('user', userProfile);
 
-// hobbiesAndInterests: {
-//     type: [String]
-// },
-// PartnerPreferences: {
-//     ageRange: {
-//         min: Number,
-//         max: Number
-//     },
-//     height: String,
-//     education: String,
-//     religion: String,
-//     caste: String,
-//     languages: String
-// },
+module.exports = mongoose.model('user', userProfile)
+
+

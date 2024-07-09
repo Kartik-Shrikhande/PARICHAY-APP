@@ -1,20 +1,20 @@
 const userModel = require("../models/user.Model")
-const eventModel =require("../models/event.model")
-const communityModel  =require("../models/comminityModel")
+const eventModel = require("../models/event.model")
+const cloudinary = require('../.config/cloudinary')
+const communityModel = require("../models/comminityModel")
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 require('dotenv').config({ path: '.env' })
-const { validationResult } = require('express-validator');
-const cloudinary =require('../.config/cloudinary')
+const { body, validationResult } = require('express-validator')
+const subscriptionModel = require('../models/subscription.model')
 
 
+//-----------------------------user signup----------------------------//
 
 const userSignup = async (req, res) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() })
     try {
-        // const { email, phoneNumber, password, title, fullName, gender, dateOfBirth, address, profession,
-        //     education, maritalStatus, religion, caste, age, height, income, languages, aboutMe, hobbiesAndInterests,
-        //     PartnerPreferences
-        // } = req.body;
         const {
             email,
             password,
@@ -42,88 +42,20 @@ const userSignup = async (req, res) => {
             caste,
             languages,
             aboutMe,
-  
+
         } = req.body;
 
-
-
-        if (!email)  return res.status(400).json({ message: 'Email is required' });
-        if (!password) return res.status(400).json({ message: 'Password is required' });
-        if (!title) return res.status(400).json({ message: 'Title is required' });
-        if (!fullName) return res.status(400).json({ message: 'Full name is required' });
-        if (!fathersName) return res.status(400).json({ message: 'Father\'s name is required' });
-        if (!phoneNumber) return res.status(400).json({ message: 'Phone number is required' });
-        if (!gender) return res.status(400).json({ message: 'Gender is required' });
-        if (!dateOfBirth) return res.status(400).json({ message: 'Date of birth is required' });
-        if (!birthTime) return res.status(400).json({ message: 'Birth time is required' });
-        if (!nativePlace) return res.status(400).json({ message: 'Native place is required' });
-        if (!height) return res.status(400).json({ message: 'Height is required' });
-        if (!education) return res.status(400).json({ message: 'Education is required' });
-        if (!profession) return res.status(400).json({ message: 'Profession is required' });
-        if (!monthlyIncome) return res.status(400).json({ message: 'Monthly income is required' });
-        if (!companyName) return res.status(400).json({ message: 'Company name is required' });
-        if (!fathersProfession) return res.status(400).json({ message: 'Father\'s profession is required' });
-        if (!numberOfSiblings) return res.status(400).json({ message: 'Number of siblings is required' });
-        if (!nameOfMaternalUncle) return res.status(400).json({ message: 'Name of maternal uncle is required' });
-        if (!address) return res.status(400).json({ message: 'Address is required' });
-        if (!correspondingAddress) return res.status(400).json({ message: 'Corresponding address is required' });
-        if (!maritalStatus) return res.status(400).json({ message: 'Marital status is required' });
-        if (!age) return res.status(400).json({ message: 'Age is required' });
-
-        
-   
-        // if (!req.files || !req.files.photograph) {
-        //     return res.status(400).json({ message: 'Photograph is required' });
-        // }
-
-        // if (!req.files || !req.files.photograph) {
-        //     return res.status(400).json({ message: 'Photograph is required' });
-        // }
-
-
-
         const photographs = [];
-        if (req.files && req.files.photograph) {
-            for (const photo of req.files.photograph) {
-                const photographFile = await cloudinary(photo.buffer);
+        if (req.files && req.files.photographs) {
+            for (const photo of req.files.photographs) {
+                const photographFile = await cloudinary(photo.buffer)
                 photographs.push(photographFile.secure_url);
             }
         }
-        // let photograph 
-        // if(req.files){
-        // //   let{photograph} = req.files
-        //   photograph=req.files.photograph
-        // }
-
-       
-
-        // Check for validation errors
-
-        // const {errors}=validationresult(req)
-
-        // const {errors} = validationResult(req);
-        // if(errors. length > 0) res.send(errors[0].msg)
- 
-
-        //const errors = validationResult(req);
-        // if (!errors.isEmpty()) {
-        //     return res.status(400).json({ errors: errors.array() });
-        // // }
-        // Const {errors}=validation result(req)
-
         const existingUser = await userModel.findOne({ email: email })
-        if (existingUser) {
-            return res.status(400).json({ message: 'User with this email already exists' })
-        }
+        if (existingUser) return res.status(400).json({ message: 'User with this email already exists' })
         // Hashing the password
         const hashedPassword = await bcrypt.hash(password, 10)
-
-        //  let photographFile=[];
-
-        // if (photograph) {
-        //     photographFile = await cloudinary(photograph[0].buffer);
-        // };
-
         const newUser = await userModel.create({
             email,
             password: hashedPassword,
@@ -151,12 +83,11 @@ const userSignup = async (req, res) => {
             caste,
             languages,
             aboutMe,
-            // photograph:photographFile?.secure_url
-            photograph: photographs
+            photographs: photographs
         });
         const token = jwt.sign({ userId: newUser._id }, process.env.SECRET_KEY, { expiresIn: '1d' })
-         res.setHeader('token', token);
-        return res.status(201).json({ message: 'User created successfully', user: newUser, token:token })
+        res.setHeader('token', token);
+        return res.status(201).json({ message: 'User created successfully', user: newUser, token: token })
     }
     catch (error) {
         return res.status(500).json({ message: error.message })
@@ -164,134 +95,102 @@ const userSignup = async (req, res) => {
 }
 
 
-// Route to handle user sign-in
+
+//------------------------------user login-----------------------------//
+
 const userlogin = async (req, res) => {
     try {
-
         // Extracting user input from request body
-        const { email, password } = req.body;
-        if (Object.keys(req.body).length == 0) return res.status(400).send({ status: false, message: "Enter Required Data" })
+        const { email, password } = req.body
+        if (Object.keys(req.body).length == 0) return res.status(400).json({ status: false, message: "Enter Required Data" })
 
         // Check if the user exists
-        const user = await userModel.findOne({ email: email });
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid email' });
-        }
+        const user = await userModel.findOne({ email: email })
+        if (!user) return res.status(401).json({ message: 'Invalid email' })
 
         // Verify the password
         const passwordMatch = await bcrypt.compare(password, user.password);
-        if (!passwordMatch) {
-            return res.status(401).json({ message: 'Invalid password' });
-        }
+        if (!passwordMatch) return res.status(401).json({ message: 'Invalid password' })
 
         // If user credentials are valid, generate JWT token
-        const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '24h' } // Token expires in 24 hour
-        );
+        const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '24h' })
         res.setHeader('Authorization', token);
-        return res.status(200).json({message: 'User log successfully',user:user,token:token});
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+        return res.status(200).json({ message: 'User log successfully', token: token })
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message })
     }
 }
 
 
 
+//------------------------------get all users-----------------------------//
 
-
-// Route to get all users
 const getAllUsers = async (req, res) => {
     try {
         const {
-            minAge,maxAge,
-            minSalary,maxSalary,
-            // minHeight,maxHeight,
-            // caste,
+            minAge, maxAge,
+            minSalary, maxSalary,
+            minHeight, maxHeight,
             gender,
-            // maritalStatus
         } = req.query
-        
-       let data ={};
-       if(minAge && maxAge ){
-        data.age ={$gte:minAge,$lte :maxAge}
-       };
 
-        
-       if(minSalary && maxSalary ){
-        data.monthlyIncome ={$gte:minSalary,$lte :maxSalary}
-       };
+        let data = {};
+        if (minAge && maxAge) {
+            data.age = { $gte: minAge, $lte: maxAge }
+        };
 
-    
-    //    if(minHeight && maxHeight ){
-    //     data.height ={$gte:minHeight,$lte :maxHeight}
-    //    };
+        if (minSalary && maxSalary) {
+            data.monthlyIncome = { $gte: minSalary, $lte: maxSalary }
+        };
 
-    //    if(caste){
-    //     data.caste=caste
-    //    };
-       
-       if(gender){
-        data.gender=gender
-       };
-    //    if(maritalStatus){
-    //     data.maritalStatus=maritalStatus
-    //    };
-    //    if(education){
-    //     data.education= { $in: education };
-    //    
-    //    };
+        if (minHeight && maxHeight) {
+            data.height = { $gte: minHeight, $lte: maxHeight }
+        };
 
-    // if (education && Array.isArray(education)) {
-    //     // Filter users where the education field matches any value in the provided array
-    //     data.education = { $in: education };
-    //     console.log(data.education);
-    // }
-
-        const users = await userModel.find({ isDeleted: false, ...data });
-        res.status(200).json({ total: users.length, data: users });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+        if (gender) {
+            data.gender = gender
+        };
+        const users = await userModel.find({ isDeleted: false, ...data })
+        return res.status(200).json({ total: users.length, data: users })
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message })
     }
 }
 
-// Route to get a user by ID
+
+
+//------------------------------get user by Id-----------------------------//
+
 const getUser = async (req, res) => {
     try {
         const user = req.userId
-        const findUser = await userModel.findOne({ _id: user, isDeleted: false });
-        if (!findUser) {
-            return res.status(404).json({ msg: 'user not found' });
-        }
-
-        res.status(200).json(findUser);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+        const findUser = await userModel.findOne({ _id: user, isDeleted: false })
+        if (!findUser) return res.status(404).json({ msg: 'user not found' })
+        return res.status(200).json(findUser)
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message })
     }
 }
 
-//remaning in update 
-//1) only able to update to update those fields which  are present in model not other than that
-//2} validations
+
+
+//------------------------------update user profile-----------------------------//
 
 const updateUserProfile = async (req, res) => {
     try {
-        const userId = req.userId;
-
+        const userId = req.userId
         // Check if the user exists
         const findUser = await userModel.findById(userId);
-        if (!findUser) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
+        if (!findUser) return res.status(404).json({ message: 'User not found' })
         // Check if the user profile exists
         let userProfile = await userModel.findById(userId);
-        if (!userProfile) return res.status(404).json({ message: 'User Profile not found' });
+        if (!userProfile) return res.status(404).json({ message: 'User Profile not found' })
         // If user profile doesn't exist, create a new one
-
-
         // If user profile already exists, update it
-        let { 
-            // email, password, phoneNumber, title, fullName, gender, dateOfBirth, address, profession,
-            // education, caste, age, height, income
+        let {
             title,
             fullName,
             fathersName,
@@ -314,36 +213,18 @@ const updateUserProfile = async (req, res) => {
             age
         } = req.body
 
-            // const {photograph} = req.files
-            const photographs = [];
-            if (req.files && req.files.photograph) {
-                for (const photo of req.files.photograph) {
-                    const photographFile = await cloudinary(photo.buffer);
-                    photographs.push(photographFile.secure_url);
-                }
+        const photographs = [];
+        if (req.files && req.files.photographs) {
+            for (const photo of req.files.photographs) {
+                const photographFile = await cloudinary(photo.buffer)
+                photographs.push(photographFile.secure_url);
             }
-   
-        // let photograph 
-        // if(req.files){
-        // //   let{photograph} = req.files
-        //   photograph=req.files.photograph
-        // }
-        //     let photographFile;
-
-        //     if (photograph) {
-        //         photographFile = await cloudinary(photograph[0].buffer);
-        //     };
-    
-        // if (Object.keys(req.body).length === 0) return res.status(400).send({ status: false, message: "Enter some Data to update" })
-
+        }
         // update blog document
         let update = await userModel.findOneAndUpdate({ _id: userId },
             {
                 $set:
-                // email, password, phoneNumber, title, fullName, gender, dateOfBirth, address, profession,
-           
-            // education, caste, age, height, income, 
-                title,
+                    title,
                 fullName,
                 fathersName,
                 phoneNumber,
@@ -363,207 +244,164 @@ const updateUserProfile = async (req, res) => {
                 correspondingAddress,
                 maritalStatus,
                 age,
-                photograph: photographs
+                photographs: photographs
             },
             { new: true })
-        return res.status(200).send({ status: true, message: 'User is updated', update })
+        return res.status(200).json({ status: true, message: 'User updated Successfully', update })
     }
-
     catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message })
     }
-};
+}
+
+
+
+//------------------------------delete user profile-----------------------------//
 
 const deleteUser = async (req, res) => {
     try {
         const user = req.userId
-
         const findUser = await userModel.findById(user);
-        if (!findUser) {
-            return res.status(404).json({ msg: 'user not found' });
-        }
-        if (findUser.isDeleted == true) return res.status(400).send({ status: false, message: "User is already Deleted" })
+        if (!findUser) return res.status(404).json({ msg: 'user not found' })
+        if (findUser.isDeleted == true) return res.status(400).json({ status: false, message: "User is already Deleted" })
         //deleting blog by its Id 
         const deleteUser = await userModel.findOneAndUpdate({ _id: user, isDeleted: false }, { $set: { isDeleted: true } })
-        return res.status(200).send({ status: true, message: "User is deleted" })
-
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+        return res.status(200).json({ status: true, message: "User is deleted" })
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message })
     }
 }
 
-// const updatePassword = async (req, res) => {
-//     try {
-//         const userId = req.userId; // Assuming you have middleware to extract userId from token
 
-//         // Retrieve the current password, new password, and confirm password from the request body
-//         const { currentPassword, newPassword, confirmPassword } = req.body;
 
-//         // Check if all required fields are present
-//         // if (!currentPassword || !newPassword || !confirmPassword) {
-//         //     return res.status(400).json({ message: 'Please provide currentPassword, newPassword, and confirmPassword' });
-//         // }
-
-//         // Find the user in the database based on userId
-//         const user = await userModel.findById(userId);
-
-//         // Check if the user exists
-//         if (!user) {
-//             return res.status(404).json({ message: 'User not found' });
-//         }
-
-//         // Check if the current password matches the password stored in the database
-//         const isPasswordMatch = await bcrypt.compare(currentPassword, user.password);
-//         if (!isPasswordMatch) {
-//             return res.status(400).json({ message: 'Current password is incorrect' });
-//         }
-
-//         // Check if the new password matches the confirm password
-//         if (newPassword !== confirmPassword) {
-//             return res.status(400).json({ message: 'New password and confirm password do not match' });
-//         }
-
-//         // Hash the new password
-//         const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-//         // Update the user's password in the database
-//         user.password = hashedPassword;
-//         await user.save();
-
-//         return res.status(200).json({ message: 'Password updated successfully' });
-//     } catch (error) {
-//         return res.status(500).json({ message: error.message });
-//     }
-// };
+//------------------------------update user password-----------------------------//
 
 const updatePassword = async (req, res) => {
     try {
-        const userId = req.userId;
-
-        const { currentPassword, newPassword, confirmPassword } = req.body;
-
-        // if (!currentPassword || !newPassword || !confirmPassword) {
-        //     return res.status(400).json({ message: 'Please provide currentPassword, newPassword, and confirmPassword' });
-        // }
-
+        const userId = req.userId
+        const { currentPassword, newPassword, confirmPassword } = req.body
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            return res.status(400).json({ message: 'Please provide currentPassword, newPassword, and confirmPassword' })
+        }
+        //validating password length
+        let length = newPassword.length
+        if (length < 8 || length > 14) return res.status(400).json({ message: 'Password must be between 8 and 14 characters long' })
         // Find the user in the database based on userId
         const user = await userModel.findById(userId);
 
         // Check if the user exists
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
+        if (!user) return res.status(404).json({ message: 'User not found' })
         // Check if the current password matches the password stored in the database
-        const isPasswordMatch = await bcrypt.compare(currentPassword, user.password);
+        const isPasswordMatch = await bcrypt.compare(currentPassword, user.password)
         if (!isPasswordMatch) {
-            return res.status(400).json({ message: 'Current password is incorrect' });
+            return res.status(400).json({ message: 'Current password is incorrect' })
         }
-
         // Check if the new password matches the confirm password
         if (newPassword !== confirmPassword) {
-            return res.status(400).json({ message: 'New password and confirm password do not match' });
+            return res.status(400).json({ message: 'New password and confirm password do not match' })
         }
         const hashedPassword = await bcrypt.hash(newPassword, 10);
-
         user.password = hashedPassword;
         await user.save();
-
-        return res.status(200).json({ message: 'Password updated successfully' });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(200).json({ message: 'Password updated successfully' })
     }
-};
+    catch (error) {
+        return res.status(500).json({ message: error.message })
+    }
+}
 
 
 
+//------------------------------subscription plans price list-----------------------------//
 
 const pricesList = async (req, res) => {
     try {
-      const prices = [
-        {plan:'Basic', price:200, subscriptionTiming:'10 days' ,profileVisits:100 },
-        {plan:'Economy' ,price:400, subscriptionTiming:'30 days' ,profileVisits:200},
-        { plan:'Premium',price:1000, subscriptionTiming:'90 days' ,profileVisits:1000},
-      
-      ];
+        const prices = [
+            { plan: 'Basic', price: 200, subscriptionTiming: '10 days', profileVisits: 100 },
+            { plan: 'Economy', price: 400, subscriptionTiming: '30 days', profileVisits: 200 },
+            { plan: 'Premium', price: 1000, subscriptionTiming: '90 days', profileVisits: 1000 },
+        ];
 
-    const admin_name = "Project Name"
-    const  admin_desc = "Description"
-    const admin_contact = "Mobile Number"
-    const  admin_email = "test@email.com"
-    const admin_key = "rzp_test_1DP5mmOlF5G5ag" 
+        const admin_name = "Project Name"
+        const admin_desc = "Description"
+        const admin_contact = "Mobile Number"
+        const admin_email = "test@email.com"
+        const admin_key = "rzp_test_1DP5mmOlF5G5ag"
 
-      return res.status(200).json({ status: true, prices: prices,admin_name:admin_name,admin_desc:admin_desc,admin_contact:admin_contact,
-        admin_email:admin_email, admin_key:admin_key})
-    } catch (err) {
-      return res.status(500).send({ status: false, message: err.message});
-  }
-  }
+        return res.status(200).json({
+            status: true, prices: prices, admin_name: admin_name, admin_desc: admin_desc, admin_contact: admin_contact,
+            admin_email: admin_email, admin_key: admin_key
+        })
+    }
+    catch (err) {
+        return res.status(500).json({ status: false, message: err.message })
+    }
+}
 
-  const subscription = async (req, res) => {
+
+
+//------------------------------subscription API-----------------------------//
+
+const subscription = async (req, res) => {
     try {
         const user = req.userId
         const findUser = await userModel.findById(user);
-        if (!findUser) {
-            return res.status(404).json({ msg: 'user not found' });
-        }
-       findUser.isSubscribed = "true" 
-             await findUser.save()
+        if (!findUser) return res.status(404).json({ msg: 'user not found' })
 
-       const {paymentId,price}=req.body
-       const subscription = await userSubscriptionModel.create(
-        {
-            userId:user,
-            paymentId,
-            price,
-        }
-       )
-         return res.status(200).json({message:'Subscription added for user',subscription:subscription});
+        const { price } = req.body
+        const validPrices = [200, 400, 1000]
+        if (!validPrices.includes(price)) return res.status(400).json({ msg: 'Invalid price : Availables plans are 200, 400, and 1000' })
 
-    } catch (err) {
-      return res.status(500).send({ status: false, message: err.message});
-  }
-  }
-
-
-  const getAllEvents = async (req, res) => {
-    try {
-
-        
-        // Find all events that are not deleted
-        const events = await eventModel.find({ isDeleted: false });
-
-        return res.status(200).json({total:events.length, events:events });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
+        findUser.isSubscribed = "true"
+        await findUser.save()
+        const subscription = await subscriptionModel.create({ userId: user, price, })
+        return res.status(200).json({ message: 'Subscription added for user', subscription: subscription })
     }
-};
+    catch (err) {
+        return res.status(500).json({ status: false, message: err.message })
+    }
+}
 
+
+
+//------------------------------get all events-----------------------------//
+
+const getAllEvents = async (req, res) => {
+    try {
+        const events = await eventModel.find({ isDeleted: false })
+        return res.status(200).json({ total: events.length, events: events })
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message })
+    }
+}
+
+
+
+//------------------------------get all community members-----------------------------//
 
 const getCommunityMembers = async (req, res) => {
     try {
-
         const user = req.userId
-        const findUser = await userModel.findById(user);
-        if (!findUser) {
-            return res.status(404).json({ msg: 'user not found' });
-        }
+        const findUser = await userModel.findById(user)
+        if (!findUser) return res.status(404).json({ msg: 'user not found' })
         // Retrieve all community members that have not been marked as deleted
-        const members = await communityModel.find({ isDeleted: false });
-
+        const members = await communityModel.find({ isDeleted: false })
         // Return the list of community members in the response
-        return res.status(200).json({ total: members.length, members });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(200).json({ total: members.length, members })
     }
-};
+    catch (error) {
+        return res.status(500).json({ message: error.message })
+    }
+}
 
 
-  
+//-----------------------------------------------------------------------//
+
 module.exports = {
     userSignup,
     userlogin,
-    // CreateUserProfile,
     getAllUsers,
     getUser,
     updateUserProfile,
