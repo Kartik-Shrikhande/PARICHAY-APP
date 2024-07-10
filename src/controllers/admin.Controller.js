@@ -1,9 +1,40 @@
 const eventModel = require("../models/event.model")
-const userModel = require("../models/user.Model");
+const adminModel = require("../models/admin.Model");
+const userModel = require('../models/user.Model')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 require('dotenv').config({ path: '.env' })
 const cloudinary = require('../.config/cloudinary')
+require('dotenv').config({ path: '.env' })
+
+
+
+//-------------------------------admin signup----------------------------------//
+
+const AdminSignup = async (req, res) => {
+    try {
+        const { email, password } = req.body
+        if (!email) return res.status(400).send({ status: false, message: 'Email is Required' })
+        if (!password) return res.status(400).send({ status: false, message: 'Password is Required' })
+        let passLength = password.length
+        if (passLength < 8 || passLength > 14) return res.status(400).json({ status: false, message: 'Password must be between 8 and 14 characters long' })
+        const findMail = await adminModel.findOne({ email, email })
+        if (findMail) return res.status(400).send({ staus: false, message: 'Admin already exist with entered Email' })
+        const hashedPassword = await bcrypt.hash(password, 10)
+        const admin = await adminModel.create({ email, password: hashedPassword })
+
+        jwt.sign({ adminId: admin._id }, process.env.SECRET_KEY, (err, token) => {
+            if (err) return res.status(401).send(err.message)
+            res.header('token', token)
+            return res.status(201).send({ status: true, messsage: 'Admin created successfully', data: admin, token: token })
+        })
+    }
+    catch (error) {
+        return res.status(500).send({ status: false, message: error.message })
+    }
+}
+
+
 
 
 //-------------------------------admin login----------------------------------//
@@ -15,7 +46,7 @@ const adminLogin = async (req, res) => {
         if (!email) return res.status(400).json({ status: false, message: "Enter Email" })
         if (!password) return res.status(400).json({ status: false, message: "Enter password" })
         //checking if email already exist 
-        const login = await userModel.findOne({ email: email, type: 'Admin' })
+        const login = await adminModel.findOne({ email: email, type: 'Admin' })
         if (!login) return res.status(404).json({ status: false, message: "Invalid Admin Email or Entered Email Does not Exist" })
 
         //Matching given password with original passowrd
@@ -23,10 +54,10 @@ const adminLogin = async (req, res) => {
         if (!pass) return res.status(400).json({ status: false, message: "Entered Wrong Password" })
 
         //Generating jsonwebtoken by signing in user
-        jwt.sign({ userId: login._id }, process.env.SECRET_KEY, { expiresIn: "24hr" }, (error, token) => {
+        jwt.sign({ adminId: login._id }, process.env.SECRET_KEY, { expiresIn: "24hr" }, (error, token) => {
             if (error) return res.status(400).json({ status: false, message: error.message })
             res.header('authorization', token)
-            return res.status(200).json({ staus: true, message: "User login Successfully", token: token })
+            return res.status(200).json({ staus: true, message: "Admin login Successfully", token: token })
         })
     }
     catch (error) {
@@ -395,7 +426,7 @@ const deleteUserById = async (req, res) => {
 
 
 module.exports = {
-    // AdminSignup,
+    AdminSignup,
     adminLogin,
     createEvent,
     updateEvent,

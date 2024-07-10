@@ -2,14 +2,17 @@ const express = require("express")
 const router = express.Router()
 const adminController = require("../controllers/admin.Controller")
 const communityController = require("../controllers/communityController")
-// const Middleware= require("../middleware/middleware")
+const Middleware = require("../middleware/middleware")
 const multer = require('multer')
 const storage = multer.memoryStorage()
 const upload = multer({ storage: storage })
 
 
-// router.post('/signup', adminController.AdminSignup)
+router.post('/signup', adminController.AdminSignup)
 router.post('/login', adminController.adminLogin)
+router.use(Middleware.authentication, Middleware.authorization)
+
+
 ////////////////////////////EVENTS///////////////////////////////
 router.post('/create-event', upload.fields([{ name: "eventPhotograph" }]), adminController.createEvent)
 router.put('/update-event/:id', upload.fields([{ name: "eventPhotograph" }]), adminController.updateEvent)
@@ -26,7 +29,6 @@ router.get('/user/:id', adminController.adminGetUserById)
 router.delete('/user-delete/:id', adminController.deleteUserById)
 
 
-// router.use(Middleware.authentication)
 //////////////////////community Members //////////////////////
 router.post('/create-member', upload.fields([{ name: "photograph" }]), communityController.createCommunityMember)
 router.put('/update-member/:id', upload.fields([{ name: "photograph" }]), communityController.updateCommunityMember)

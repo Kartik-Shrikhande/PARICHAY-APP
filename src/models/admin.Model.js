@@ -2,9 +2,6 @@ const mongoose = require('mongoose')
 
 
 const adminSignup = new mongoose.Schema({
-    AdminName: {
-        type: String
-    },
     email: {
         type: String,
         required: true,
@@ -13,6 +10,10 @@ const adminSignup = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    type: {
+        type: String,
+        default: 'Admin'
     },
 }, { timestamps: true })
 
