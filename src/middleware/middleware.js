@@ -3,6 +3,10 @@ require('dotenv').config({ path: '.env' })
 const adminModel = require("../models/admin.Model");
 require('dotenv').config({ path: '.env' })
 
+
+
+//-------------------------------authentication------------------------------------//
+
 const authentication = async (req, res, next) => {
     try {
         let token = req.headers.authorization
@@ -25,6 +29,9 @@ const authentication = async (req, res, next) => {
 }
 
 
+
+
+//-------------------------------authorization------------------------------------//
 
 const authorization = async (req, res, next) => {
     try {
@@ -53,6 +60,11 @@ const authorization = async (req, res, next) => {
         return res.status(500).send({ status: false, message: error.message })
     }
 }
+
+
+
+
+//----------------------------------------------------------------------//
 
 
 module.exports = {
