@@ -163,22 +163,48 @@ npm start
 Here are some of the main API endpoints available in this project:
 
 ADMINS APIs :-
-- `POST /signup` : Admin Signup
-- `POST /login` : Admin Login
+- `POST /admin/signup` : Admin Signup
+- `POST /admin/login` : Admin Login
 - 
  Admin - Event 
-- `POST /create-event` : Create Event
-- `PUT /update-event/:id` : Update Event 
-- `DELETE /delete/:id` : Delete Event
-- `GET /all-events` : Get All Events
-- `GET /event/:id` : Get Event By Id
+- `POST /admin/create-event` : Create Event
+- `PUT /admin/update-event/:id` : Update Event 
+- `DELETE /admin/delete/:id` : Delete Event
+- `GET /admin/all-events` : Get All Events
+- `GET /admin/event/:id` : Get Event By Id
 
 Admin - User
-- `POST /create-user` : Create User By Admin
-- `PUT /update-user/:id` : Update User By Admin
-- `GET /users` : Get All User By Admin
-- `GET /user/:id` : Get User By Id - Admin
-- `DELETE /user-delete/:id` : Delete User By Admin
+- `POST /admin/create-user` : Create User By Admin
+- `PUT /admin/update-user/:id` : Update User By Admin
+- `GET /admin/users` : Get All User By Admin
+- `GET /admin/user/:id` : Get User By Id - Admin
+- `DELETE /admin/user-delete/:id` : Delete User By Admin
+
+Admin - community
+- `POST /admin/create-member` : Create Community Member By Admin
+- `PUT /admin/update-member/:id` :  Update Community Member By Admin
+- `DELETE /admin/delete-member/:id` :  Delete Community Member By Admin
+- `GET /admin/members` :  Get All Community Members By Admin
+
+
+USERS APIs :-
+- `POST /user/signup` : User Signup
+- `POST /user/login` : User Login
+- `GET /user/users` : Get All User
+- `GET /user/user` : Get User
+- `PUT /user/update` : Update User
+- `DELETE /user/delete` : Delete User
+- `POST /user/update-password` : Update Password
+- `GET /user/prices` : Get Plans List
+- `POST /user/subscription` : Subscribed Premium Plans
+- `GET /user/user-events` : Get All Events
+- `GET /user/members` : Get Community Members
+
+ Users - OTP
+- `POST /otp/otp` : Received OTP On Email
+- `POST /otp/verify` : Verify OTP
+- `PUT /otp/new-password` : Reset New Password
+
 
 ## License
 
