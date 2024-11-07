@@ -18,7 +18,7 @@
 
 ## Overview
 
-The Matrimony Project is a web application designed to help individuals find their life partners. Users can create profiles, browse other profiles, The platform includes features for user authentication, profile management,photo uploads, subscription plans, and more. Whether you're looking for someone with a specific background, profession, or interest, our platform makes it easy to find and connect with potential matches, ensuring a safe and efficient experience.Our goal is to provide a trusted and user-friendly environment where users can find their perfect match with ease and confidence.
+Parichay App is same as Matrimony Project is a web application designed to help individuals find their life partners. Users can create profiles, browse other profiles, The platform includes features for user authentication, profile management,photo uploads, subscription plans, and more. Whether you're looking for someone with a specific background, profession, or interest, our platform makes it easy to find and connect with potential matches, ensuring a safe and efficient experience.Our goal is to provide a trusted and user-friendly environment where users can find their perfect match with ease and confidence.
 
 
 ## Features
